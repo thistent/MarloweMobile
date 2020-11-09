@@ -62,6 +62,7 @@ type SampleContract
     | Escrow
     | Swap
     | ZeroCoupon
+    | NilContract
 
 
 type Blink
@@ -150,6 +151,11 @@ update msg model =
                     , Cmd.none
                     )
 
+                NilContract ->
+                    ( { model | sampleContract = Sem.Refund }
+                    , Cmd.none
+                    )
+
         ToggleKeyboard ->
             ( { model | keyboardState = not model.keyboardState }
             , Cmd.none
@@ -214,6 +220,7 @@ view model =
                     , button Escrow "Escrow"
                     , button Swap "Swap"
                     , button ZeroCoupon "ZeroCouponBond"
+                    , button NilContract "Nil"
                     ]
                 , el
                     [ width fill
@@ -308,7 +315,7 @@ genContractView : Blink -> Sem.Contract -> Element Msg
 genContractView blink contract =
     case contract of
         Sem.Refund ->
-            singletonHeader blink Hi.refund "Refund"
+            singletonHeader blink Hi.refund "Refund remaining"
 
         Sem.Pay p1 p2 v a ->
             [ topHeader "Pay from"

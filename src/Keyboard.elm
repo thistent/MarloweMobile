@@ -50,7 +50,7 @@ kb =
         , Border.roundEach { corners | topLeft = margin, topRight = margin }
         , Border.color <| Hi.keyboardBorder
         , Bg.color <| keyBg 0.9 Hi.bgBlue
-        , Font.size 30
+        , Font.size 20
         , padding margin
         , spacing margin
         ]
@@ -65,16 +65,16 @@ kb =
                 [ key (ContractKey Sem.Refund) Hi.letColor "Let"
                 , key (ContractKey Sem.Refund) Hi.caseColor "Case"
                 , key (ContractKey Sem.Refund) Hi.accountId "Account"
-                , key (ContractKey Sem.Refund) Hi.string "\"Str\""
+                , key (ContractKey Sem.Refund) Hi.string "\" \""
                 ]
             , row [ width fill, spacing margin ]
-                [ key (ContractKey Sem.Refund) Hi.numColor "Num"
+                [ key (ContractKey Sem.Refund) Hi.numColor "42"
                 , key (ContractKey Sem.Refund) Hi.value "ValueId"
                 , key (ContractKey Sem.Refund) Hi.andOr "And"
                 , key (ContractKey Sem.Refund) Hi.andOr "Or"
                 ]
             ]
-        , column [ width fill, spacing margin ]
+        , column [ Font.size 20, width fill, spacing margin ]
             [ key (ContractKey Sem.Refund) Hi.white "Copy"
             , key (ContractKey Sem.Refund) Hi.white "Paste"
             ]
