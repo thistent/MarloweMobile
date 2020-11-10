@@ -41,11 +41,12 @@ borderWidth =
     2
 
 
-kb : Element msg
-kb =
-    row
+kb : Sem.Contract -> Element msg
+kb contract =
+    column
         [ alignBottom
         , width fill
+        , height <| px 650
         , Border.width borderWidth
         , Border.roundEach { corners | topLeft = margin, topRight = margin }
         , Border.color <| Hi.keyboardBorder
@@ -54,35 +55,63 @@ kb =
         , padding margin
         , spacing margin
         ]
-        [ column [ width <| fillPortion 4, spacing margin ]
-            [ row [ width fill, spacing margin ]
-                [ key (Paste <| ContractExpr Sem.Refund) Hi.refund "Refund"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.pay "Pay"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.ifColor "If"
-                , key (Paste <| ContractExpr Sem.Refund) (rgb 1 0.2 0) "When"
-                ]
-            , row [ width fill, spacing margin ]
-                [ key (Paste <| ContractExpr Sem.Refund) Hi.letColor "Let"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.caseColor "Case"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.accountId "Account"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.string "\" \""
-                ]
-            , row [ width fill, spacing margin ]
-                [ key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
-                ]
-            , row [ width fill, spacing margin ]
-                [ key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
-                ]
+        [ row [ width fill, height fill, spacing margin ]
+            [ key (Paste <| ContractExpr Sem.Refund) Hi.refund "Refund"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.pay "Pay"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.letColor "Let"
+            , key (Paste <| ContractExpr Sem.Refund) (rgb 1 0.2 0) "When"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.white "Copy"
             ]
-        , column [ Font.size 20, width fill, spacing margin ]
-            [ key (Paste <| ContractExpr Sem.Refund) Hi.white "Copy"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste"
+        , row [ width fill, height fill, spacing margin ]
+            [ column [ width <| fillPortion 4, height fill, spacing margin ]
+                [ row [ width fill, height fill, spacing margin ]
+                    [ key (Paste <| ContractExpr Sem.Refund) Hi.string "\" \""
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.accountId "Account"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.ifColor "If"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.caseColor "Case"
+                    ]
+                , row [ width fill, height fill, spacing margin ]
+                    [ key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.notColor "Not"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
+                    ]
+                , row [ width fill, height fill, spacing margin ]
+                    [ key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.trueObs "True"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueGT ">"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueGE ">="
+                    ]
+                , row [ width fill, height fill, spacing margin ]
+                    [ key (Paste <| ContractExpr Sem.Refund) Hi.value "Choose"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.falseObs "False"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueLT "<"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueLE "<="
+                    ]
+                , row [ width fill, height fill, spacing margin ]
+                    [ key (Paste <| ContractExpr Sem.Refund) Hi.deposit "Deposit"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.choice "Choice"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.notify "Notify"
+                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueEQ "="
+                    ]
+                ]
+            , column
+                [ height <| px 500
+                , alignTop
+                , width fill
+                , spacing margin
+                , clipY
+                ]
+                [ key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste"
+                , column
+                    [ height <| px 400
+                    , width fill
+                    , clipY
+                    ]
+                    [ el [ padding margin, scrollbarY, width fill, height fill ] <|
+                        genMiniContractView contract
+                    ]
+                ]
             ]
         ]
 
@@ -130,219 +159,413 @@ key keyType color label =
 
 
 
--- Old Stuff --
+-- Mini Contract View --
 
 
-kbOld : Element msg
-kbOld =
+genMiniContractView : Sem.Contract -> Element msg
+genMiniContractView contract =
+    case contract of
+        Sem.Refund ->
+            singletonMiniHeader Hi.refund
+
+        Sem.Pay p1 p2 v a ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniAccountIdView
+            , midMiniHeader
+            , subMiniScope <| genMiniPayeeView p2
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView a
+            ]
+                |> scopeMiniBlock Hi.pay
+
+        Sem.If o a b ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView o
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView a
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView b
+            ]
+                |> scopeMiniBlock Hi.ifColor
+
+        Sem.When xs _ y ->
+            [ topMiniHeader
+            , column
+                [ paddingEach { edges | top = 1, left = 1, bottom = 1 }
+                ]
+                (xs |> List.map genMiniCaseView)
+            , midMiniHeader
+            , subMiniScope <| genMiniNumberView
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView y
+            ]
+                |> scopeMiniBlock Hi.contractColor
+
+        Sem.Let _ val a ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniNumberView
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView val
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView a
+            ]
+                |> scopeMiniBlock Hi.letColor
+
+
+genMiniCaseView : Sem.Case Sem.Action Sem.Contract -> Element msg
+genMiniCaseView (Sem.Case a c) =
+    [ topMiniHeader
+    , subMiniScope <| genMiniActionView a
+    , midMiniHeader
+    , subMiniScope <| genMiniContractView c
+    ]
+        |> scopeMiniBlock Hi.caseColor
+
+
+genMiniPayeeView : Sem.Payee -> Element msg
+genMiniPayeeView payee =
+    case payee of
+        Sem.Account _ ->
+            genMiniAccountIdView
+
+        Sem.Party _ ->
+            genMiniStringView
+
+
+genMiniAccountIdView : Element msg
+genMiniAccountIdView =
+    [ topMiniHeader
+    , subMiniScope <| genMiniNumberView
+    , midMiniHeader
+    , subMiniScope <| genMiniStringView
+    ]
+        |> scopeMiniBlock Hi.accountId
+
+
+genMiniStringView : Element msg
+genMiniStringView =
+    singletonMiniHeader (rgb 0 0.5 0.2)
+
+
+genMiniNumberView : Element msg
+genMiniNumberView =
+    singletonMiniHeader (rgb 0.6 0.8 0.2)
+
+
+genMiniValueView : Sem.Value Sem.Observation -> Element msg
+genMiniValueView val =
+    case val of
+        Sem.AvailableMoney ->
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
+
+        Sem.Constant _ ->
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
+
+        Sem.NegValue v ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniValueView v
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
+
+        Sem.AddValue v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
+
+        Sem.SubValue v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
+
+        Sem.MulValue v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
+
+        Sem.Scale _ v ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniRationalView
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v
+            ]
+                |> scopeMiniBlock
+                    (rgb 0.6 0.8 0.2)
+
+        Sem.ChoiceValue id v ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniChoiceIdView id
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v
+            , endMiniHeader
+            ]
+                |> scopeMiniBlock
+                    (rgb 0.6 0.8 0.2)
+
+        Sem.SlotIntervalStart ->
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
+
+        Sem.SlotIntervalEnd ->
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
+
+        Sem.UseValue _ ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniNumberView
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
+
+        Sem.Cond o a b ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView o
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView a
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView b
+            ]
+                |> scopeMiniBlock
+                    (rgb 0.6 0.8 0.2)
+
+
+genMiniObservationView : Sem.Observation -> Element msg
+genMiniObservationView obs =
+    case obs of
+        Sem.AndObs o1 o2 ->
+            [ subMiniScope <| genMiniObservationView o1
+            , midMiniHeader
+            , subMiniScope <| genMiniObservationView o2
+            ]
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
+
+        Sem.OrObs o1 o2 ->
+            [ subMiniScope <| genMiniObservationView o1
+            , midMiniHeader
+            , subMiniScope <| genMiniObservationView o2
+            ]
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
+
+        Sem.NotObs o ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView o
+            ]
+                |> scopeMiniBlock (rgb 0.32 0.4 0.8)
+
+        Sem.ChooseSomething id ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniChoiceIdView id
+            ]
+                |> scopeMiniBlock (rgb 0.32 0.4 0.8)
+
+        Sem.ValueGE v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
+
+        Sem.ValueGT v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
+
+        Sem.ValueLT v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
+
+        Sem.ValueLE v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
+
+        Sem.ValueEQ v1 v2 ->
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
+            ]
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
+
+        Sem.TrueObs ->
+            singletonMiniHeader (rgb 0.64 0.8 1)
+
+        Sem.FalseObs ->
+            singletonMiniHeader (rgb 0.2 0.25 0.5)
+
+
+genMiniActionView : Sem.Action -> Element msg
+genMiniActionView action =
+    case action of
+        Sem.Deposit _ _ val ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniAccountIdView
+            , midMiniHeader
+            , subMiniScope <| genMiniStringView
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView val
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.3 0.7)
+
+        Sem.Choice _ bounds ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniStringView
+            , midMiniHeader
+            , subMiniScope <| genMiniStringView
+            , midMiniHeader
+            , column
+                [ paddingEach { edges | top = 1, left = 1, bottom = 1 }
+                ]
+                (bounds |> List.map genMiniBoundsView)
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.3 0.7)
+
+        Sem.Notify obs ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView obs
+            ]
+                |> scopeMiniBlock (rgb 0.6 0.3 0.7)
+
+
+genMiniBoundsView : Sem.Bound -> Element msg
+genMiniBoundsView (Sem.Bound a b) =
+    [ topMiniHeader
+    , subMiniScope <| genMiniNumberView
+    , midMiniHeader
+    , subMiniScope <| genMiniNumberView
+    ]
+        |> scopeMiniBlock (rgb 0.6 0.3 0.15)
+
+
+genMiniChoiceIdView : Sem.ChoiceId -> Element msg
+genMiniChoiceIdView (Sem.ChoiceId choice owner) =
+    [ topMiniHeader
+    , subMiniScope <| genMiniStringView
+    , midMiniHeader
+    , subMiniScope <| genMiniStringView
+    ]
+        |> scopeMiniBlock (rgb 0.3 0.6 0.15)
+
+
+genMiniRationalView : Element msg
+genMiniRationalView =
+    [ subMiniScope <| genMiniNumberView
+    , midMiniHeader
+    , subMiniScope <| genMiniNumberView
+    ]
+        |> scopeMiniBlock (rgb 0.6 0.8 0.2)
+
+
+
+-- Managing Mini Complexity --
+
+
+scopeMiniBlock : Color -> List (Element msg) -> Element msg
+scopeMiniBlock color elems =
     column
-        [ alignBottom
-        , alignRight
-        , Border.width borderWidth
-        , Border.rounded margin
-        , Border.color <| Hi.keyboardBorder
-        , Bg.color Hi.bgBlue
-        , paddingEach { edges | top = margin, bottom = margin }
-        , spacing <| margin
+        [ Border.widthEach { edges | left = borderWidth // 2 }
+        , Border.roundEach
+            { corners
+                | topLeft = borderWidth
+                , bottomLeft = borderWidth
+            }
+        , Font.color color
         ]
-        [ column
-            [ width fill
-            , spacing <| margin
-            , paddingXY 0 margin
-            , Font.size 30
-            , Font.color <| Hi.keyboardText
-            , Border.widthEach { edges | bottom = borderWidth }
-            , Border.dotted
-            ]
-            [ el [ centerX, Font.letterSpacing 10 ] <|
-                text "Keyboard"
-            , el [ centerX, Font.size 18, Font.letterSpacing 1.5 ] <|
-                text "(Click outside to close)"
-            ]
-        , column
-            [ width fill
-            , height fill
-            , spacing margin
-            , padding margin
-            ]
-            [ row [ width fill, spacing margin ]
-                [ el
-                    [ padding margin
-                    , width fill
-                    , Bg.color <| rgb 1 0 0
-                    ]
-                  <|
-                    text "hi"
-                , el
-                    [ padding margin
-                    , width fill
-                    , Bg.color <| rgb 0 1 0
-                    ]
-                  <|
-                    text "hi"
-                ]
-            , row [ width fill, spacing margin ]
-                [ el
-                    [ padding margin
-                    , width fill
-                    , Bg.color <| rgb 1 0 0
-                    ]
-                  <|
-                    text "hi"
-                , el
-                    [ padding margin
-                    , width fill
-                    , Bg.color <| rgb 0 1 0
-                    ]
-                  <|
-                    text "hi"
-                ]
-            ]
+        elems
+
+
+topMiniHeader : Element msg
+topMiniHeader =
+    el
+        [ Border.widthEach
+            { edges
+                | top = borderWidth // 2
+                , right = borderWidth // 2
+                , bottom = borderWidth // 2
+            }
+        , Border.roundEach
+            { corners
+                | topLeft = borderWidth
+                , topRight = borderWidth
+                , bottomRight = borderWidth
+            }
+        , paddingXY borderWidth (borderWidth // 2)
         ]
+    <|
+        text ""
 
 
+midMiniHeader : Element msg
+midMiniHeader =
+    el
+        [ Border.widthEach
+            { edges
+                | top = borderWidth // 2
+                , right = borderWidth // 2
+                , bottom = borderWidth // 2
+            }
+        , Border.roundEach
+            { corners
+                | topRight = borderWidth
+                , bottomRight = borderWidth
+            }
+        , paddingXY borderWidth (borderWidth // 2)
+        ]
+    <|
+        text ""
 
-{- column
-       [ width fill
-       , height fill
-       , spacing margin
-       ]
-       [ el
-           [ width fill
-           , height <| fillPortion 11
-           ]
-         <|
-           el
-               [ width fill
-               , height fill
-               , inFront <|
-                   el
-                       [ width fill
-                       , height fill
-                       , Bg.color <| rgba 0.08 0.08 0.16 0.75
-                       ]
-                       none
-               ]
-               ([ subScope <|
-                   el
-                       [ width fill
-                       , height <| px 200
-                       , scrollbarY
-                       ]
-                   <|
-                       genMiniContractView Regular model.sampleContract
-                , endHeader "Paste"
-                ]
-                   |> scopeBlock Regular white
-               )
-       , el [ width fill, height fill ] <|
-           keyboardButton Regular white "Copy"
-       ]
-   , column
-       [ width fill
-       , height fill
-       , spacing margin
-       ]
-       [ keyboardButton Regular contractColor "All"
-       , keyboardButton Regular contractColor "Const."
-       , keyboardButton Regular contractColor "Neg"
-       , keyboardButton Regular contractColor "Add"
-       , keyboardButton Regular contractColor "Sub"
-       , keyboardButton Regular contractColor "Mult"
-       , keyboardButton Regular contractColor "Scale"
-       , keyboardButton Regular contractColor "Choice"
-       , keyboardButton Regular contractColor "Start"
-       , keyboardButton Regular contractColor "End"
-       , keyboardButton Regular contractColor "Use"
-       , keyboardButton Regular contractColor "Cond"
-       ]
-       ]
--}
-{- [ column [ width fill, height fill ]
-       [ el
-           [ width fill
-           , height <| fillPortion 10
-           , inFront <|
-               el
-                   [ width fill
-                   , height fill
-                   , Bg.color <| rgba 0.08 0.08 0.16 0.75
-                   ]
-                   none
-           ]
-           ([ subScope <|
-               el
-                   [ width fill
-                   , height fill
-                   , scrollbarY
-                   ]
-               <|
-                   genMiniContractView Regular model.sampleContract
-            , endHeader "Paste"
-            ]
-               |> scopeBlock Regular white
-           )
-       ]
-   , column
-       [ width fill
-       , spacing <| margin * 2
-       ]
-       ]
--}
-{- el [ padding margin, width fill ] <|
-       column [ centerX, Font.color <| Hi.keyboardText ]
-           [ el
-               [ centerX
 
-               --, Font.size 35
-               --, Font.letterSpacing 5
-               ]
-             <|
-               text "Keyboard"
-           , el [] <| text "(Click outside to close)"
-           ]
-   , row
-       [ width fill
-       , height fill
-       , spacing <| 2 * margin
-       , paddingEach
-           { edges
-               | left = margin
-               , right = margin
-               , bottom = 2 * margin
-               , top = margin
-           }
-       ]
-       [ column
-           [ alignBottom
-           , spacing <| 2 * margin
-           , width fill
-           ]
-           , keyboardButton Regular white "Copy"
-           ]
-       , column
-           [ alignBottom, spacing <| margin * 2 ]
-           [ keyboardButton Regular contractColor "All"
-           , keyboardButton Regular contractColor "Const."
-           , keyboardButton Regular contractColor "Neg"
-           , keyboardButton Regular contractColor "Add"
-           , keyboardButton Regular contractColor "Sub"
-           , keyboardButton Regular contractColor "Mult"
-           , keyboardButton Regular contractColor "Scale"
-           , keyboardButton Regular contractColor "Choice"
-           , keyboardButton Regular contractColor "Start"
-           , keyboardButton Regular contractColor "End"
-           , keyboardButton Regular contractColor "Use"
-           , keyboardButton Regular contractColor "Cond"
-           ]
+endMiniHeader : Element msg
+endMiniHeader =
+    el
+        [ Border.widthEach
+            { edges
+                | top = borderWidth // 2
+                , right = borderWidth // 2
+                , bottom = borderWidth // 2
+            }
+        , Border.roundEach
+            { corners
+                | bottomLeft = borderWidth
+                , topRight = borderWidth
+                , bottomRight = borderWidth
+            }
+        , paddingXY borderWidth (borderWidth // 2)
+        ]
+    <|
+        text ""
 
-       {- [ keyboardButton Regular contractColor "Refund"
-          , keyboardButton Regular contractColor "Pay"
-          , keyboardButton Regular contractColor "If"
-          , keyboardButton Regular contractColor "When"
-          , keyboardButton Regular contractColor "Let"
-          ]
-       -}
-       ]
-       ]
--}
+
+singletonMiniHeader : Color -> Element msg
+singletonMiniHeader color =
+    el
+        [ Font.color color
+        , Border.width <| borderWidth // 2
+        , Border.rounded borderWidth
+        , paddingXY borderWidth (borderWidth // 2)
+        ]
+    <|
+        text ""
+
+
+subMiniScope : Element msg -> Element msg
+subMiniScope elem =
+    el
+        [ paddingEach
+            { edges
+                | top = borderWidth // 2
+                , left = borderWidth // 2
+                , bottom = borderWidth // 2
+            }
+        ]
+        elem
