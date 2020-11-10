@@ -233,7 +233,10 @@ view model =
                     ]
                   <|
                     ([ topHeader "Contract such that"
-                     , subScope <| genContractView model.blink model.sampleContract
+
+                     -- TODO: model.blink along with the unique id of the subtree where blink should
+                     -- start if something is selected should be passed to genContractView.
+                     , subScope <| genContractView Regular model.sampleContract
                      ]
                         |> scopeBlock Regular Hi.contractBase
                     )
