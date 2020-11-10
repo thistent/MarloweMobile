@@ -500,54 +500,54 @@ genObservationView blink obs =
             [ topHeader "not"
             , subScope <| genObservationView blink o
             ]
-                |> scopeBlock blink (rgb 0.32 0.4 0.8)
+                |> scopeBlock blink Hi.notColor
 
         Sem.ChooseSomething id ->
             [ topHeader "The choice"
             , subScope <| genChoiceIdView blink id
             ]
-                |> scopeBlock blink (rgb 0.32 0.4 0.8)
+                |> scopeBlock blink Hi.chooseSomething
 
         Sem.ValueGE v1 v2 ->
             [ subScope <| genValueView blink v1
             , midHeader "is greater than or equal to"
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink (rgb 0.4 0.5 1)
+                |> scopeBlock blink Hi.valueGE
 
         Sem.ValueGT v1 v2 ->
             [ subScope <| genValueView blink v1
             , midHeader "is greater than"
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink (rgb 0.4 0.5 1)
+                |> scopeBlock blink Hi.valueGT
 
         Sem.ValueLT v1 v2 ->
             [ subScope <| genValueView blink v1
             , midHeader "is less than"
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink (rgb 0.4 0.5 1)
+                |> scopeBlock blink Hi.valueLT
 
         Sem.ValueLE v1 v2 ->
             [ subScope <| genValueView blink v1
             , midHeader "is less than or equal to"
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink (rgb 0.4 0.5 1)
+                |> scopeBlock blink Hi.valueLE
 
         Sem.ValueEQ v1 v2 ->
             [ subScope <| genValueView blink v1
             , midHeader "is equal to"
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink (rgb 0.4 0.5 1)
+                |> scopeBlock blink Hi.valueEQ
 
         Sem.TrueObs ->
-            singletonHeader blink (rgb 0.64 0.8 1) "True"
+            singletonHeader blink Hi.trueObs "True"
 
         Sem.FalseObs ->
-            singletonHeader blink (rgb 0.2 0.25 0.5) "False"
+            singletonHeader blink Hi.falseObs "False"
 
 
 genActionView : Blink -> Sem.Action -> Element Msg
@@ -561,7 +561,7 @@ genActionView blink action =
             , midHeader "the amount of"
             , subScope <| genValueView blink val
             ]
-                |> scopeBlock blink (rgb 0.6 0.3 0.7)
+                |> scopeBlock blink Hi.deposit
 
         Sem.Choice (Sem.ChoiceId name owner) bounds ->
             [ topHeader "A choice called"
@@ -574,13 +574,13 @@ genActionView blink action =
                 ]
                 (bounds |> List.map (genBoundsView blink))
             ]
-                |> scopeBlock blink (rgb 0.6 0.3 0.7)
+                |> scopeBlock blink Hi.deposit
 
         Sem.Notify obs ->
             [ topHeader "Notify when"
             , subScope <| genObservationView blink obs
             ]
-                |> scopeBlock blink (rgb 0.6 0.3 0.7)
+                |> scopeBlock blink Hi.notify
 
 
 genBoundsView : Blink -> Sem.Bound -> Element Msg
@@ -590,7 +590,7 @@ genBoundsView blink (Sem.Bound a b) =
     , midHeader "and"
     , subScope <| genNumberView blink b
     ]
-        |> scopeBlock blink (rgb 0.6 0.3 0.15)
+        |> scopeBlock blink Hi.bounds
 
 
 genChoiceIdView : Blink -> Sem.ChoiceId -> Element Msg
@@ -600,7 +600,7 @@ genChoiceIdView blink (Sem.ChoiceId choice owner) =
     , midHeader "with owner"
     , subScope <| genStringView blink owner
     ]
-        |> scopeBlock blink (rgb 0.3 0.6 0.15)
+        |> scopeBlock blink Hi.choiceId
 
 
 genRationalView : Blink -> Sem.Rational -> Element Msg
@@ -609,315 +609,315 @@ genRationalView blink (Sem.Rational n d) =
     , midHeader "over"
     , subScope <| genNumberView blink d
     ]
-        |> scopeBlock blink (rgb 0.6 0.8 0.2)
+        |> scopeBlock blink Hi.rational
 
 
 
 -- Mini View for Clipboard --
 
 
-genMiniContractView : Blink -> Sem.Contract -> Element Msg
-genMiniContractView blink contract =
+genMiniContractView : Sem.Contract -> Element Msg
+genMiniContractView contract =
     case contract of
         Sem.Refund ->
-            singletonMiniHeader blink (rgb 0.65 0.05 0) ""
+            singletonMiniHeader Hi.refund
 
         Sem.Pay p1 p2 v a ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniAccountIdView blink p1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniPayeeView blink p2
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v
-            , midMiniHeader ""
-            , subMiniScope <| genMiniContractView blink a
+            [ topMiniHeader
+            , subMiniScope <| genMiniAccountIdView
+            , midMiniHeader
+            , subMiniScope <| genMiniPayeeView p2
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView a
             ]
-                |> scopeMiniBlock blink (rgb 1 0.55 0.15)
+                |> scopeMiniBlock Hi.pay
 
         Sem.If o a b ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniObservationView blink o
-            , midMiniHeader ""
-            , subMiniScope <| genMiniContractView blink a
-            , midMiniHeader ""
-            , subMiniScope <| genMiniContractView blink b
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView o
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView a
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView b
             ]
-                |> scopeMiniBlock blink (rgb 1 0.4 0)
+                |> scopeMiniBlock Hi.ifColor
 
-        Sem.When xs t y ->
-            [ topMiniHeader ""
+        Sem.When xs _ y ->
+            [ topMiniHeader
             , column
                 [ paddingEach { edges | top = 1, left = 1, bottom = 1 }
                 ]
-                (xs |> List.map (genMiniCaseView blink))
-            , midMiniHeader ""
-            , subMiniScope <| genMiniNumberView blink t
-            , midMiniHeader ""
-            , subMiniScope <| genMiniContractView blink y
+                (xs |> List.map genMiniCaseView)
+            , midMiniHeader
+            , subMiniScope <| genMiniNumberView
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView y
             ]
-                |> scopeMiniBlock blink Hi.contractColor
+                |> scopeMiniBlock Hi.contractColor
 
-        Sem.Let id val a ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniNumberView blink id
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink val
-            , midMiniHeader ""
-            , subMiniScope <| genMiniContractView blink a
+        Sem.Let _ val a ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniNumberView
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView val
+            , midMiniHeader
+            , subMiniScope <| genMiniContractView a
             ]
-                |> scopeMiniBlock blink (rgb 0.8 0.2 0.4)
+                |> scopeMiniBlock Hi.letColor
 
 
-genMiniCaseView : Blink -> Sem.Case Sem.Action Sem.Contract -> Element Msg
-genMiniCaseView blink (Sem.Case a c) =
-    [ topMiniHeader ""
-    , subMiniScope <| genMiniActionView blink a
-    , midMiniHeader ""
-    , subMiniScope <| genMiniContractView blink c
+genMiniCaseView : Sem.Case Sem.Action Sem.Contract -> Element Msg
+genMiniCaseView (Sem.Case a c) =
+    [ topMiniHeader
+    , subMiniScope <| genMiniActionView a
+    , midMiniHeader
+    , subMiniScope <| genMiniContractView c
     ]
-        |> scopeMiniBlock blink (rgb 1 0.8 0)
+        |> scopeMiniBlock Hi.caseColor
 
 
-genMiniPayeeView : Blink -> Sem.Payee -> Element Msg
-genMiniPayeeView blink payee =
+genMiniPayeeView : Sem.Payee -> Element Msg
+genMiniPayeeView payee =
     case payee of
-        Sem.Account id ->
-            genMiniAccountIdView blink id
+        Sem.Account _ ->
+            genMiniAccountIdView
 
-        Sem.Party name ->
-            genMiniStringView blink name
+        Sem.Party _ ->
+            genMiniStringView
 
 
-genMiniAccountIdView : Blink -> Sem.AccountId -> Element Msg
-genMiniAccountIdView blink (Sem.AccountId num owner) =
-    [ topMiniHeader ""
-    , subMiniScope <| genMiniNumberView blink num
-    , midMiniHeader ""
-    , subMiniScope <| genMiniStringView blink owner
+genMiniAccountIdView : Element Msg
+genMiniAccountIdView =
+    [ topMiniHeader
+    , subMiniScope <| genMiniNumberView
+    , midMiniHeader
+    , subMiniScope <| genMiniStringView
     ]
-        |> scopeMiniBlock blink (rgb 0 0.45 0.65)
+        |> scopeMiniBlock Hi.accountId
 
 
-genMiniStringView : Blink -> String -> Element Msg
-genMiniStringView blink str =
-    singletonMiniHeader blink (rgb 0 0.5 0.2) ""
+genMiniStringView : Element Msg
+genMiniStringView =
+    singletonMiniHeader (rgb 0 0.5 0.2)
 
 
-genMiniNumberView : Blink -> Int -> Element Msg
-genMiniNumberView blink num =
-    singletonMiniHeader blink (rgb 0.6 0.8 0.2) ""
+genMiniNumberView : Element Msg
+genMiniNumberView =
+    singletonMiniHeader (rgb 0.6 0.8 0.2)
 
 
-genMiniValueView : Blink -> Sem.Value Sem.Observation -> Element Msg
-genMiniValueView blink val =
+genMiniValueView : Sem.Value Sem.Observation -> Element Msg
+genMiniValueView val =
     case val of
         Sem.AvailableMoney ->
-            singletonMiniHeader blink (rgb 0.6 0.8 0.2) <| ""
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
 
-        Sem.Constant num ->
-            singletonMiniHeader blink (rgb 0.6 0.8 0.2) <| ""
+        Sem.Constant _ ->
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
 
         Sem.NegValue v ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v
+            [ topMiniHeader
+            , subMiniScope <| genMiniValueView v
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.8 0.2)
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
 
         Sem.AddValue v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.8 0.2)
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
 
         Sem.SubValue v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.8 0.2)
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
 
         Sem.MulValue v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.8 0.2)
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
 
-        Sem.Scale rat v ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniRationalView blink rat
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v
+        Sem.Scale _ v ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniRationalView
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v
             ]
-                |> scopeMiniBlock blink
+                |> scopeMiniBlock
                     (rgb 0.6 0.8 0.2)
 
         Sem.ChoiceValue id v ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniChoiceIdView blink id
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v
-            , endMiniHeader ""
+            [ topMiniHeader
+            , subMiniScope <| genMiniChoiceIdView id
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v
+            , endMiniHeader
             ]
-                |> scopeMiniBlock blink
+                |> scopeMiniBlock
                     (rgb 0.6 0.8 0.2)
 
         Sem.SlotIntervalStart ->
-            singletonMiniHeader blink (rgb 0.6 0.8 0.2) ""
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
 
         Sem.SlotIntervalEnd ->
-            singletonMiniHeader blink (rgb 0.6 0.8 0.2) ""
+            singletonMiniHeader (rgb 0.6 0.8 0.2)
 
-        Sem.UseValue id ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniNumberView blink id
+        Sem.UseValue _ ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniNumberView
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.8 0.2)
+                |> scopeMiniBlock (rgb 0.6 0.8 0.2)
 
         Sem.Cond o a b ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniObservationView blink o
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink a
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink b
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView o
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView a
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView b
             ]
-                |> scopeMiniBlock blink
+                |> scopeMiniBlock
                     (rgb 0.6 0.8 0.2)
 
 
-genMiniObservationView : Blink -> Sem.Observation -> Element Msg
-genMiniObservationView blink obs =
+genMiniObservationView : Sem.Observation -> Element Msg
+genMiniObservationView obs =
     case obs of
         Sem.AndObs o1 o2 ->
-            [ subMiniScope <| genMiniObservationView blink o1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniObservationView blink o2
+            [ subMiniScope <| genMiniObservationView o1
+            , midMiniHeader
+            , subMiniScope <| genMiniObservationView o2
             ]
-                |> scopeMiniBlock blink (rgb 0.4 0.5 1)
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
 
         Sem.OrObs o1 o2 ->
-            [ subMiniScope <| genMiniObservationView blink o1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniObservationView blink o2
+            [ subMiniScope <| genMiniObservationView o1
+            , midMiniHeader
+            , subMiniScope <| genMiniObservationView o2
             ]
-                |> scopeMiniBlock blink (rgb 0.4 0.5 1)
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
 
         Sem.NotObs o ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniObservationView blink o
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView o
             ]
-                |> scopeMiniBlock blink (rgb 0.32 0.4 0.8)
+                |> scopeMiniBlock (rgb 0.32 0.4 0.8)
 
         Sem.ChooseSomething id ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniChoiceIdView blink id
+            [ topMiniHeader
+            , subMiniScope <| genMiniChoiceIdView id
             ]
-                |> scopeMiniBlock blink (rgb 0.32 0.4 0.8)
+                |> scopeMiniBlock (rgb 0.32 0.4 0.8)
 
         Sem.ValueGE v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.4 0.5 1)
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
 
         Sem.ValueGT v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.4 0.5 1)
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
 
         Sem.ValueLT v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.4 0.5 1)
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
 
         Sem.ValueLE v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.4 0.5 1)
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
 
         Sem.ValueEQ v1 v2 ->
-            [ subMiniScope <| genMiniValueView blink v1
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink v2
+            [ subMiniScope <| genMiniValueView v1
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView v2
             ]
-                |> scopeMiniBlock blink (rgb 0.4 0.5 1)
+                |> scopeMiniBlock (rgb 0.4 0.5 1)
 
         Sem.TrueObs ->
-            singletonMiniHeader blink (rgb 0.64 0.8 1) ""
+            singletonMiniHeader (rgb 0.64 0.8 1)
 
         Sem.FalseObs ->
-            singletonMiniHeader blink (rgb 0.2 0.25 0.5) ""
+            singletonMiniHeader (rgb 0.2 0.25 0.5)
 
 
-genMiniActionView : Blink -> Sem.Action -> Element Msg
-genMiniActionView blink action =
+genMiniActionView : Sem.Action -> Element Msg
+genMiniActionView action =
     case action of
-        Sem.Deposit id str val ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniAccountIdView blink id
-            , midMiniHeader ""
-            , subMiniScope <| genMiniStringView blink str
-            , midMiniHeader ""
-            , subMiniScope <| genMiniValueView blink val
+        Sem.Deposit _ _ val ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniAccountIdView
+            , midMiniHeader
+            , subMiniScope <| genMiniStringView
+            , midMiniHeader
+            , subMiniScope <| genMiniValueView val
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.3 0.7)
+                |> scopeMiniBlock (rgb 0.6 0.3 0.7)
 
-        Sem.Choice (Sem.ChoiceId name owner) bounds ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniStringView blink name
-            , midMiniHeader ""
-            , subMiniScope <| genMiniStringView blink owner
-            , midMiniHeader ""
+        Sem.Choice _ bounds ->
+            [ topMiniHeader
+            , subMiniScope <| genMiniStringView
+            , midMiniHeader
+            , subMiniScope <| genMiniStringView
+            , midMiniHeader
             , column
                 [ paddingEach { edges | top = 1, left = 1, bottom = 1 }
                 ]
-                (bounds |> List.map (genMiniBoundsView blink))
+                (bounds |> List.map genMiniBoundsView)
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.3 0.7)
+                |> scopeMiniBlock (rgb 0.6 0.3 0.7)
 
         Sem.Notify obs ->
-            [ topMiniHeader ""
-            , subMiniScope <| genMiniObservationView blink obs
+            [ topMiniHeader
+            , subMiniScope <| genMiniObservationView obs
             ]
-                |> scopeMiniBlock blink (rgb 0.6 0.3 0.7)
+                |> scopeMiniBlock (rgb 0.6 0.3 0.7)
 
 
-genMiniBoundsView : Blink -> Sem.Bound -> Element Msg
-genMiniBoundsView blink (Sem.Bound a b) =
-    [ topMiniHeader ""
-    , subMiniScope <| genMiniNumberView blink a
-    , midMiniHeader ""
-    , subMiniScope <| genMiniNumberView blink b
+genMiniBoundsView : Sem.Bound -> Element Msg
+genMiniBoundsView (Sem.Bound a b) =
+    [ topMiniHeader
+    , subMiniScope <| genMiniNumberView
+    , midMiniHeader
+    , subMiniScope <| genMiniNumberView
     ]
-        |> scopeMiniBlock blink (rgb 0.6 0.3 0.15)
+        |> scopeMiniBlock (rgb 0.6 0.3 0.15)
 
 
-genMiniChoiceIdView : Blink -> Sem.ChoiceId -> Element Msg
-genMiniChoiceIdView blink (Sem.ChoiceId choice owner) =
-    [ topMiniHeader ""
-    , subMiniScope <| genMiniStringView blink choice
-    , midMiniHeader ""
-    , subMiniScope <| genMiniStringView blink owner
+genMiniChoiceIdView : Sem.ChoiceId -> Element Msg
+genMiniChoiceIdView (Sem.ChoiceId choice owner) =
+    [ topMiniHeader
+    , subMiniScope <| genMiniStringView
+    , midMiniHeader
+    , subMiniScope <| genMiniStringView
     ]
-        |> scopeMiniBlock blink (rgb 0.3 0.6 0.15)
+        |> scopeMiniBlock (rgb 0.3 0.6 0.15)
 
 
-genMiniRationalView : Blink -> Sem.Rational -> Element Msg
-genMiniRationalView blink (Sem.Rational n d) =
-    [ subMiniScope <| genMiniNumberView blink n
-    , midMiniHeader ""
-    , subMiniScope <| genMiniNumberView blink d
+genMiniRationalView : Element Msg
+genMiniRationalView =
+    [ subMiniScope <| genMiniNumberView
+    , midMiniHeader
+    , subMiniScope <| genMiniNumberView
     ]
-        |> scopeMiniBlock blink (rgb 0.6 0.8 0.2)
+        |> scopeMiniBlock (rgb 0.6 0.8 0.2)
 
 
 
@@ -1031,8 +1031,8 @@ subScope elem =
 -- Managing Mini Complexity --
 
 
-scopeMiniBlock : Blink -> Color -> List (Element Msg) -> Element Msg
-scopeMiniBlock blink color elems =
+scopeMiniBlock : Color -> List (Element Msg) -> Element Msg
+scopeMiniBlock color elems =
     column
         [ Border.widthEach { edges | left = borderWidth // 2 }
         , Border.roundEach
@@ -1040,13 +1040,13 @@ scopeMiniBlock blink color elems =
                 | topLeft = borderWidth
                 , bottomLeft = borderWidth
             }
-        , Font.color <| blinkColor blink color
+        , Font.color color
         ]
         elems
 
 
-topMiniHeader : String -> Element Msg
-topMiniHeader label =
+topMiniHeader : Element Msg
+topMiniHeader =
     el
         [ Border.widthEach
             { edges
@@ -1063,11 +1063,11 @@ topMiniHeader label =
         , paddingXY borderWidth (borderWidth // 2)
         ]
     <|
-        text label
+        text ""
 
 
-midMiniHeader : String -> Element Msg
-midMiniHeader label =
+midMiniHeader : Element Msg
+midMiniHeader =
     el
         [ Border.widthEach
             { edges
@@ -1083,11 +1083,11 @@ midMiniHeader label =
         , paddingXY borderWidth (borderWidth // 2)
         ]
     <|
-        text label
+        text ""
 
 
-endMiniHeader : String -> Element Msg
-endMiniHeader label =
+endMiniHeader : Element Msg
+endMiniHeader =
     el
         [ Border.widthEach
             { edges
@@ -1104,19 +1104,19 @@ endMiniHeader label =
         , paddingXY borderWidth (borderWidth // 2)
         ]
     <|
-        text label
+        text ""
 
 
-singletonMiniHeader : Blink -> Color -> String -> Element Msg
-singletonMiniHeader blink color label =
+singletonMiniHeader : Color -> Element Msg
+singletonMiniHeader color =
     el
-        [ Font.color <| blinkColor blink color
+        [ Font.color color
         , Border.width <| borderWidth // 2
         , Border.rounded borderWidth
         , paddingXY borderWidth (borderWidth // 2)
         ]
     <|
-        text label
+        text ""
 
 
 subMiniScope : Element Msg -> Element Msg

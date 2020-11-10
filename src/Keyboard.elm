@@ -56,27 +56,33 @@ kb =
         ]
         [ column [ width <| fillPortion 4, spacing margin ]
             [ row [ width fill, spacing margin ]
-                [ key (ContractKey Sem.Refund) Hi.refund "Refund"
-                , key (ContractKey Sem.Refund) Hi.pay "Pay"
-                , key (ContractKey Sem.Refund) Hi.ifColor "If"
-                , key (ContractKey Sem.Refund) (rgb 1 0.2 0) "When"
+                [ key (Paste <| ContractExpr Sem.Refund) Hi.refund "Refund"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.pay "Pay"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.ifColor "If"
+                , key (Paste <| ContractExpr Sem.Refund) (rgb 1 0.2 0) "When"
                 ]
             , row [ width fill, spacing margin ]
-                [ key (ContractKey Sem.Refund) Hi.letColor "Let"
-                , key (ContractKey Sem.Refund) Hi.caseColor "Case"
-                , key (ContractKey Sem.Refund) Hi.accountId "Account"
-                , key (ContractKey Sem.Refund) Hi.string "\" \""
+                [ key (Paste <| ContractExpr Sem.Refund) Hi.letColor "Let"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.caseColor "Case"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.accountId "Account"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.string "\" \""
                 ]
             , row [ width fill, spacing margin ]
-                [ key (ContractKey Sem.Refund) Hi.numColor "42"
-                , key (ContractKey Sem.Refund) Hi.value "ValueId"
-                , key (ContractKey Sem.Refund) Hi.andOr "And"
-                , key (ContractKey Sem.Refund) Hi.andOr "Or"
+                [ key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
+                ]
+            , row [ width fill, spacing margin ]
+                [ key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
                 ]
             ]
         , column [ Font.size 20, width fill, spacing margin ]
-            [ key (ContractKey Sem.Refund) Hi.white "Copy"
-            , key (ContractKey Sem.Refund) Hi.white "Paste"
+            [ key (Paste <| ContractExpr Sem.Refund) Hi.white "Copy"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste"
             ]
         ]
 
@@ -85,24 +91,29 @@ kb =
 -- Keyboard Button --
 
 
-type KeyType
-    = StringKey String
-    | NumKey Int
-    | TokenKey Sem.Token
-    | ValueIdKey Sem.ValueId
-    | PayeeKey Sem.Payee
-    | BoundKey Sem.Bound
-    | CaseKey (Sem.Case Sem.Action Sem.Contract)
-    | RationalKey Sem.Rational
-    | AccountIdKey Sem.AccountId
-    | ChoiceIdKey Sem.ChoiceId
-    | ContractKey Sem.Contract
-    | ValueKey (Sem.Value Sem.Observation)
-    | ObservationKey Sem.Observation
-    | ActionKey Sem.Action
+type Expr
+    = StringExpr String
+    | NumExpr Int
+    | TokenExpr Sem.Token
+    | ValueIdExpr Sem.ValueId
+    | PayeeExpr Sem.Payee
+    | BoundExpr Sem.Bound
+    | CaseExpr (Sem.Case Sem.Action Sem.Contract)
+    | RationalExpr Sem.Rational
+    | AccountIdExpr Sem.AccountId
+    | ChoiceIdExpr Sem.ChoiceId
+    | ContractExpr Sem.Contract
+    | ValueExpr (Sem.Value Sem.Observation)
+    | ObservationExpr Sem.Observation
+    | ActionExpr Sem.Action
 
 
-key : KeyType -> Color -> String -> Element msg
+type KeyMsg
+    = Copy Expr
+    | Paste Expr
+
+
+key : KeyMsg -> Color -> String -> Element msg
 key keyType color label =
     el
         [ Font.center

@@ -86,3 +86,78 @@ bgBlue =
 accentPink : Color
 accentPink =
     rgb 1 0.7 0.95
+
+
+notColor : Color
+notColor =
+    rgb 0.32 0.4 0.8
+
+
+chooseSomething : Color
+chooseSomething =
+    rgb 0.32 0.4 0.8
+
+
+valueGE : Color
+valueGE =
+    rgb 0.4 0.5 1
+
+
+valueGT : Color
+valueGT =
+    rgb 0.4 0.5 1
+
+
+valueLT : Color
+valueLT =
+    rgb 0.4 0.5 1
+
+
+valueLE : Color
+valueLE =
+    rgb 0.4 0.5 1
+
+
+valueEQ : Color
+valueEQ =
+    rgb 0.4 0.5 1
+
+
+trueObs : Color
+trueObs =
+    rgb 0.64 0.8 1
+
+
+falseObs : Color
+falseObs =
+    rgb 0.2 0.25 0.5
+
+
+deposit : Color
+deposit =
+    rgb 0.6 0.3 0.7
+
+
+choice : Color
+choice =
+    rgb 0.6 0.3 0.7
+
+
+notify : Color
+notify =
+    rgb 0.6 0.3 0.7
+
+
+bounds : Color
+bounds =
+    rgb 0.6 0.3 0.15
+
+
+choiceId : Color
+choiceId =
+    rgb 0.3 0.6 0.15
+
+
+rational : Color
+rational =
+    rgb 0.6 0.8 0.2
