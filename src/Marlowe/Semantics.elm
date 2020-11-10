@@ -143,11 +143,15 @@ type AnnoChoiceId
     = AnnoChoiceId String String Anno
 
 
+type AnnoCase a b
+    = AnnoCase a b Anno
+
+
 type AnnoContract
     = AnnoRefund Anno
     | AnnoPay AnnoAccountId AnnoPayee (AnnoValue AnnoObservation) AnnoContract Anno
     | AnnoIf AnnoObservation AnnoContract AnnoContract Anno
-    | AnnoWhen (List (Case AnnoAction AnnoContract)) Int AnnoContract Anno
+    | AnnoWhen (List (AnnoCase AnnoAction AnnoContract)) Int AnnoContract Anno
     | AnnoLet (AnnoValue AnnoObservation) AnnoContract Anno
 
 
@@ -167,9 +171,9 @@ type AnnoValue a
 
 
 type AnnoObservation
-    = AnnoAndObs Observation Observation Anno
-    | AnnoOrObs Observation Observation Anno
-    | AnnoNotObs Observation Anno
+    = AnnoAndObs AnnoObservation AnnoObservation Anno
+    | AnnoOrObs AnnoObservation AnnoObservation Anno
+    | AnnoNotObs AnnoObservation Anno
     | AnnoChooseSomething AnnoChoiceId Anno
     | AnnoValueGE (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
     | AnnoValueGT (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
@@ -181,7 +185,7 @@ type AnnoObservation
 
 
 type AnnoAction
-    = AnnoDeposit AccountId String (AnnoValue AnnoObservation) Anno
+    = AnnoDeposit AnnoAccountId String (AnnoValue AnnoObservation) Anno
     | AnnoChoice AnnoChoiceId (List AnnoBound) Anno
     | AnnoNotify AnnoObservation Anno
 
@@ -196,42 +200,67 @@ annotateContract contract =
         Refund ->
             AnnoRefund U.unique
 
-        Pay p1 p2 v a ->
-            AnnoRefund U.unique
+        Pay p1 p2 v c ->
+            AnnoPay
+                (annotateAccountId p1)
+                (annotatePayee p2)
+                (annotateValue v)
+                (annotateContract c)
+                U.unique
 
         If o a b ->
-            AnnoRefund U.unique
+            AnnoIf
+                (annotateObservation o)
+                (annotateContract a)
+                (annotateContract b)
+                U.unique
 
         When xs t y ->
-            AnnoRefund U.unique
+            AnnoWhen
+                (xs |> List.map annotateCase)
+                t
+                (annotateContract y)
+                U.unique
 
         Let id val a ->
             AnnoRefund U.unique
 
 
-annotateValue : Value a -> AnnoValue a
+annotateValue : Value Observation -> AnnoValue AnnoObservation
 annotateValue val =
     case val of
         AvailableMoney ->
             AnnoAvailableMoney U.unique
 
         Constant num ->
-            AnnoAvailableMoney U.unique
+            AnnoConstant num U.unique
 
         NegValue v ->
-            AnnoAvailableMoney U.unique
+            AnnoNegValue (annotateValue v) U.unique
 
         AddValue v1 v2 ->
-            AnnoAvailableMoney U.unique
+            AnnoAddValue
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         SubValue v1 v2 ->
-            AnnoAvailableMoney U.unique
+            AnnoSubValue
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         MulValue v1 v2 ->
-            AnnoAvailableMoney U.unique
+            AnnoMulValue
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         Scale rat v ->
-            AnnoAvailableMoney U.unique
+            AnnoScale
+                (annotateRational rat)
+                (annotateValue v)
+                U.unique
 
         ChoiceValue id v ->
             AnnoAvailableMoney U.unique
@@ -253,37 +282,119 @@ annotateObservation : Observation -> AnnoObservation
 annotateObservation obs =
     case obs of
         AndObs o1 o2 ->
-            AnnoTrueObs U.unique
+            AnnoAndObs
+                (annotateObservation o1)
+                (annotateObservation o2)
+                U.unique
 
         OrObs o1 o2 ->
-            AnnoTrueObs U.unique
+            AnnoOrObs
+                (annotateObservation o1)
+                (annotateObservation o2)
+                U.unique
 
         NotObs o ->
-            AnnoTrueObs U.unique
+            AnnoNotObs
+                (annotateObservation o)
+                U.unique
 
         ChooseSomething id ->
-            AnnoTrueObs U.unique
+            AnnoChooseSomething
+                (annotateChoiceId id)
+                U.unique
 
         ValueGE v1 v2 ->
-            AnnoTrueObs U.unique
+            AnnoValueGE
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         ValueGT v1 v2 ->
-            AnnoTrueObs U.unique
+            AnnoValueGT
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         ValueLT v1 v2 ->
-            AnnoTrueObs U.unique
+            AnnoValueLT
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         ValueLE v1 v2 ->
-            AnnoTrueObs U.unique
+            AnnoValueLE
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         ValueEQ v1 v2 ->
-            AnnoTrueObs U.unique
+            AnnoValueEQ
+                (annotateValue v1)
+                (annotateValue v2)
+                U.unique
 
         TrueObs ->
             AnnoTrueObs U.unique
 
         FalseObs ->
-            AnnoTrueObs U.unique
+            AnnoFalseObs U.unique
+
+
+annotateAction : Action -> AnnoAction
+annotateAction act =
+    case act of
+        Deposit id str v ->
+            AnnoDeposit (annotateAccountId id)
+                str
+                (annotateValue v)
+                U.unique
+
+        Choice id xs ->
+            AnnoChoice (annotateChoiceId id)
+                (xs |> List.map annotateBound)
+                U.unique
+
+        Notify o ->
+            AnnoNotify (annotateObservation o) U.unique
+
+
+annotateCase : Case Action Contract -> AnnoCase AnnoAction AnnoContract
+annotateCase (Case a c) =
+    AnnoCase (annotateAction a)
+        (annotateContract c)
+        U.unique
+
+
+annotateChoiceId : ChoiceId -> AnnoChoiceId
+annotateChoiceId (ChoiceId s1 s2) =
+    AnnoChoiceId s1 s2 U.unique
+
+
+annotateRational : Rational -> AnnoRational
+annotateRational (Rational n1 n2) =
+    AnnoRational n1 n2 U.unique
+
+
+annotateAccountId : AccountId -> AnnoAccountId
+annotateAccountId (AccountId num str) =
+    AnnoAccountId num str U.unique
+
+
+annotatePayee : Payee -> AnnoPayee
+annotatePayee p =
+    case p of
+        Account id ->
+            AnnoAccount
+                (annotateAccountId id)
+                U.unique
+
+        Party str ->
+            AnnoParty str U.unique
+
+
+annotateBound : Bound -> AnnoBound
+annotateBound (Bound i j) =
+    AnnoBound i j U.unique
 
 
 
