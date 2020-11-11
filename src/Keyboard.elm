@@ -41,12 +41,12 @@ borderWidth =
     2
 
 
-kb : Sem.Contract -> Element msg
-kb contract =
-    column
+kb : Float -> Sem.Contract -> Element msg
+kb screenHeight contract =
+    row
         [ alignBottom
         , width fill
-        , height <| px 650
+        , height <| px <| round <| screenHeight * 0.45
         , Border.width borderWidth
         , Border.roundEach { corners | topLeft = margin, topRight = margin }
         , Border.color <| Hi.keyboardBorder
@@ -55,68 +55,94 @@ kb contract =
         , padding margin
         , spacing margin
         ]
-        [ row [ width fill, height fill, spacing margin ]
+        [ column [ width fill, height fill, spacing margin ]
             [ key (Paste <| ContractExpr Sem.Refund) Hi.refund "Refund"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.pay "Pay"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.letColor "Let"
-            , key (Paste <| ContractExpr Sem.Refund) (rgb 1 0.2 0) "When"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.white "Copy"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.string "\" \""
+            , key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.value "Choose"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.deposit "Deposit"
             ]
-        , row [ width fill, height fill, spacing margin ]
-            [ column [ width <| fillPortion 4, height fill, spacing margin ]
-                [ row [ width fill, height fill, spacing margin ]
-                    [ key (Paste <| ContractExpr Sem.Refund) Hi.string "\" \""
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.accountId "Account"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.ifColor "If"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.caseColor "Case"
-                    ]
-                , row [ width fill, height fill, spacing margin ]
-                    [ key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.notColor "Not"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
-                    ]
-                , row [ width fill, height fill, spacing margin ]
-                    [ key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.trueObs "True"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueGT ">"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueGE ">="
-                    ]
-                , row [ width fill, height fill, spacing margin ]
-                    [ key (Paste <| ContractExpr Sem.Refund) Hi.value "Choose"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.falseObs "False"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueLT "<"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueLE "<="
-                    ]
-                , row [ width fill, height fill, spacing margin ]
-                    [ key (Paste <| ContractExpr Sem.Refund) Hi.deposit "Deposit"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.choice "Choice"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.notify "Notify"
-                    , key (Paste <| ContractExpr Sem.Refund) Hi.valueEQ "="
-                    ]
-                ]
-            , column
-                [ height <| px 500
-                , alignTop
-                , width fill
+        , column [ width fill, height fill, spacing margin ]
+            [ key (Paste <| ContractExpr Sem.Refund) Hi.pay "Pay"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.accountId "Account"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.notColor "Not"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.trueObs "True"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.falseObs "False"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.choice "Choice"
+            ]
+        , column [ width fill, height fill, spacing margin ]
+            [ key (Paste <| ContractExpr Sem.Refund) Hi.letColor "Let"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.ifColor "If"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.valueGT ">"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.valueLT "<"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.notify "Notify"
+            ]
+        , column [ width fill, height fill, spacing margin ]
+            [ key (Paste <| ContractExpr Sem.Refund) (rgb 1 0.2 0) "When"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.caseColor "Case"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
+            , key (Paste <| ContractExpr Sem.Refund) Hi.valueGE ">="
+            , key (Paste <| ContractExpr Sem.Refund) Hi.valueLE "<="
+            , key (Paste <| ContractExpr Sem.Refund) Hi.valueEQ "="
+            ]
+        , column [ width fill, height fill, spacing margin ]
+            [ column
+                [ width fill
+                , height <| px <| round <| screenHeight * 0.45 / 3
                 , spacing margin
-                , clipY
                 ]
-                [ key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste"
-                , column
-                    [ height <| px 400
-                    , width fill
-                    , clipY
-                    ]
-                    [ el [ padding margin, scrollbarY, width fill, height fill ] <|
-                        genMiniContractView contract
-                    ]
+                [ key (Paste <| ContractExpr Sem.Refund) Hi.white "Copy"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste"
                 ]
+            , el
+                [ width fill
+                , height <| px <| round <| screenHeight * 0.45 * 2 / 3
+                , clip
+                , scrollbars
+                ]
+              <|
+                genMiniContractView contract
             ]
         ]
 
 
 
+{-
+
+   row [ width fill, height fill, spacing margin ]
+       ]
+   , row [ width fill, height fill, spacing margin ]
+       ]
+   , row [ width fill, height <| fillPortion 4, spacing margin ]
+       [ column [ width <| fillPortion 4, height fill, spacing margin ]
+           [ row [ width fill, height fill, spacing margin ]
+               ]
+           , row [ width fill, height fill, spacing margin ]
+               ]
+           , row [ width fill, height fill, spacing margin ]
+               ]
+           , row [ width fill, height fill, spacing margin ]
+               ]
+           ]
+       , column
+           [ height <| px 500
+           , alignTop
+           , width fill
+           , spacing margin
+           , clipY
+           ]
+           [ column
+               [ height <| px 400
+               , width fill
+               , clipY
+               ]
+           ]
+       ]
+   ]
+
+-}
 -- Keyboard Button --
 
 
@@ -151,7 +177,9 @@ key keyType color label =
         , Border.width borderWidth
         , Border.rounded margin
         , width fill
-        , paddingXY margin (margin * 3 // 2)
+        , height fill
+
+        --, paddingXY margin (margin * 3 // 2)
         ]
     <|
         el [ centerY, centerX ] <|

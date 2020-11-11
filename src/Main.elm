@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Browser
+import Browser.Dom as Dom
 import Browser.Events as Events
 import Browser.Navigation as Nav
 import Color as C
@@ -14,6 +15,7 @@ import Element.Input as Input
 import Highlight as Hi
 import Keyboard as Kb
 import Marlowe.Semantics as Sem
+import Task
 import Url
 
 
@@ -46,6 +48,7 @@ type alias Model =
     , blink : Blink
     , sampleContract : Sem.Contract
     , keyboardState : Bool
+    , viewport : Dom.Viewport
     }
 
 
@@ -55,6 +58,7 @@ type Msg
     | TimeDelta Float
     | SwitchContract SampleContract
     | ToggleKeyboard
+    | UpdateViewport Dom.Viewport
 
 
 type SampleContract
@@ -75,9 +79,28 @@ type Blink
 -- Initialization --
 
 
+dummyViewport : Dom.Viewport
+dummyViewport =
+    { scene =
+        { width = 0
+        , height = 0
+        }
+    , viewport =
+        { x = 0
+        , y = 0
+        , width = 0
+        , height = 0
+        }
+    }
+
+
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url 0.0 Regular Sem.escrow False, Cmd.none )
+    ( Model key url 0.0 Regular Sem.escrow False dummyViewport
+    , Cmd.batch
+        [ Task.perform UpdateViewport Dom.getViewport
+        ]
+    )
 
 
 
@@ -127,7 +150,11 @@ update msg model =
                 )
 
             else
-                ( { model | timeDelta = 0 }, Cmd.none )
+                ( { model | timeDelta = 0 }
+                , Cmd.batch
+                    [ Task.perform UpdateViewport Dom.getViewport
+                    ]
+                )
 
         SwitchContract contract ->
             case contract of
@@ -161,6 +188,9 @@ update msg model =
             , Cmd.none
             )
 
+        UpdateViewport vp ->
+            ( { model | viewport = vp }, Cmd.none )
+
 
 
 -- View Function --
@@ -182,7 +212,7 @@ view model =
                 ]
             , inFront <|
                 if model.keyboardState then
-                    Kb.kb model.sampleContract
+                    Kb.kb model.viewport.viewport.height model.sampleContract
 
                 else
                     none
