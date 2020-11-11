@@ -210,6 +210,8 @@ view model =
                 [ Font.typeface "Helvetica"
                 , Font.sansSerif
                 ]
+            , clip
+            , scrollbarY
             , inFront <|
                 if model.keyboardState then
                     Kb.kb model.viewport.viewport.height model.sampleContract
