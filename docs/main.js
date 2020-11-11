@@ -5509,7 +5509,6 @@ var $author$project$Main$init = F3(
 						A2($elm$core$Task$perform, $author$project$Main$UpdateViewport, $elm$browser$Browser$Dom$getViewport)
 					])));
 	});
-var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $author$project$Main$TimeDelta = function (a) {
 	return {$: 2, a: a};
 };
@@ -14148,4 +14147,5 @@ var $author$project$Main$view = function (model) {
 };
 var $author$project$Main$main = $elm$browser$Browser$application(
 	{cK: $author$project$Main$init, c1: $author$project$Main$NewUrl, c2: $author$project$Main$Link, ds: $author$project$Main$subs, dJ: $author$project$Main$update, dL: $author$project$Main$view});
-_Platform_export({'Main':{'init':$author$project$Main$main($elm$json$Json$Decode$int)(0)}});}(this));
+_Platform_export({'Main':{'init':$author$project$Main$main(
+	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
