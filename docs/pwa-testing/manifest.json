@@ -1,6 +1,6 @@
 { 
 	"name":"Marlowe Mobile", 
-	"short_name":"Marlowe", 
+	"short_name":"Marlowe Mobile", 
 	"start_url":"index.html", 
 	"display":"standalone", 
 	"background_color":"#5900b3", 
@@ -10,7 +10,7 @@
 	"icons":[ 
 	  { 
 	  "src":"images/icon-192x192.png",					 
-	  "sizes":"192x192", 
+	  "sizes":"192x192",
 	  "type":"image/png"
 	  }, 
 	  { 
