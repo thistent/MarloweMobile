@@ -23,7 +23,7 @@ import Url
 -- Main Function --
 
 
-main : Program () Model Msg
+main : Program Int Model Msg
 main =
     Browser.application
         { init = init
@@ -94,8 +94,8 @@ dummyViewport =
     }
 
 
-init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
+init : Int -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init _ url key =
     ( Model key url 0.0 Regular Sem.escrow False dummyViewport
     , Cmd.batch
         [ Task.perform UpdateViewport Dom.getViewport
