@@ -16,14 +16,21 @@
 
   <!-- Manifest File link -->
   <link rel="manifest" href="manifest.json"> 
+
+  <!-- Elm App -->
+  <script src="main.js"></script>
 </head> 
 
 <body> 
-<h1>Marlowe Mobile</h1> 
 
-<p>Temporary Page Test</p> 
+<div id="elm"></div>
 
 <script> 
+  var app = Elm.Main.init({
+    node : document.getElementById('elm')
+    flags []
+  });
+
 	window.addEventListener('load', () => { 
 	registerSW(); 
 	}); 
@@ -42,5 +49,6 @@
 	} 
 	} 
 </script>
+
 </body> 
 </html>
