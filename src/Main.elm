@@ -372,12 +372,13 @@ genContractView blink contract =
             ]
                 |> scopeBlock blink Hi.ifColor
 
-        Sem.When xs t y ->
+        Sem.When cases t y ->
             [ topHeader "When"
             , column
                 [ paddingEach { edges | top = margin, left = margin, bottom = margin }
                 ]
-                (xs |> List.map (genCaseView blink))
+                (cases |> List.map (genCaseView blink))
+            , subScope <| singletonHeader blink Hi.caseColor "..."
             , midHeader "after slot"
             , subScope <| genNumberView blink t
             , midHeader "continue as"
@@ -398,7 +399,7 @@ genContractView blink contract =
 
 genCaseView : Blink -> Sem.Case Sem.Action Sem.Contract -> Element Msg
 genCaseView blink (Sem.Case a c) =
-    [ topHeader "In case of action"
+    [ topHeader "Case of action"
     , subScope <| genActionView blink a
     , midHeader "do contract"
     , subScope <| genContractView blink c
@@ -606,6 +607,7 @@ genActionView blink action =
                 [ paddingEach { edges | top = gap, left = gap, bottom = gap }
                 ]
                 (bounds |> List.map (genBoundsView blink))
+            , subScope <| singletonHeader blink Hi.bounds "..."
             ]
                 |> scopeBlock blink Hi.deposit
 
