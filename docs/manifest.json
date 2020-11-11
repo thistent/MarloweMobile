@@ -1,12 +1,12 @@
 { 
-	"name":"PWA Tutorial", 
-	"short_name":"PWA", 
+	"name":"Marlowe Mobile", 
+	"short_name":"Marlowe", 
 	"start_url":"index.html", 
 	"display":"standalone", 
 	"background_color":"#5900b3", 
 	"theme_color":"black", 
 	"scope": ".", 
-	"description":"This is a PWA tutorial.", 
+	"description":"Marlowe development for mobile devices.", 
 	"icons":[ 
 	  { 
 	  "src":"images/icon-192x192.png",					 
