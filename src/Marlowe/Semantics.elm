@@ -100,45 +100,33 @@ type alias Anno =
     U.Unique U.Id
 
 
-
-{-
-
-   type alias AnnotatedContract =
-       ( Contract, Annotation )
+type AnnoNum
+    = AnnoNum Int Anno
 
 
-   type alias AnnotatedValue a =
-       ( Value a, Annotation )
-
-
-   type alias AnnotatedObservation =
-       ( Observation, Annotation )
-
-
-   type alias AnnotatedAction =
-       ( Action, Annotation )
--}
+type AnnoString
+    = AnnoString String Anno
 
 
 type AnnoPayee
     = AnnoAccount AnnoAccountId Anno
-    | AnnoParty String Anno
+    | AnnoParty AnnoString Anno
 
 
 type AnnoBound
-    = AnnoBound Int Int Anno
+    = AnnoBound AnnoNum AnnoNum Anno
 
 
 type AnnoRational
-    = AnnoRational Int Int Anno
+    = AnnoRational AnnoNum AnnoNum Anno
 
 
 type AnnoAccountId
-    = AnnoAccountId Int String Anno
+    = AnnoAccountId AnnoNum AnnoString Anno
 
 
 type AnnoChoiceId
-    = AnnoChoiceId String String Anno
+    = AnnoChoiceId AnnoString AnnoString Anno
 
 
 type AnnoCase a b
@@ -149,13 +137,13 @@ type AnnoContract
     = AnnoRefund Anno
     | AnnoPay AnnoAccountId AnnoPayee (AnnoValue AnnoObservation) AnnoContract Anno
     | AnnoIf AnnoObservation AnnoContract AnnoContract Anno
-    | AnnoWhen (List (AnnoCase AnnoAction AnnoContract)) Int AnnoContract Anno
-    | AnnoLet (AnnoValue AnnoObservation) AnnoContract Anno
+    | AnnoWhen (List (AnnoCase AnnoAction AnnoContract)) AnnoNum AnnoContract Anno
+    | AnnoLet AnnoNum (AnnoValue AnnoObservation) AnnoContract Anno
 
 
 type AnnoValue a
     = AnnoAvailableMoney Anno
-    | AnnoConstant Int Anno
+    | AnnoConstant AnnoNum Anno
     | AnnoNegValue (AnnoValue a) Anno
     | AnnoAddValue (AnnoValue a) (AnnoValue a) Anno
     | AnnoSubValue (AnnoValue a) (AnnoValue a) Anno
@@ -164,7 +152,7 @@ type AnnoValue a
     | AnnoChoiceValue AnnoChoiceId (AnnoValue a) Anno
     | AnnoSlotIntervalStart Anno
     | AnnoSlotIntervalEnd Anno
-    | AnnoUseValue Int Anno
+    | AnnoUseValue AnnoNum Anno
     | AnnoCond a (AnnoValue a) (AnnoValue a) Anno
 
 
@@ -183,7 +171,7 @@ type AnnoObservation
 
 
 type AnnoAction
-    = AnnoDeposit AnnoAccountId String (AnnoValue AnnoObservation) Anno
+    = AnnoDeposit AnnoAccountId AnnoString (AnnoValue AnnoObservation) Anno
     | AnnoChoice AnnoChoiceId (List AnnoBound) Anno
     | AnnoNotify AnnoObservation Anno
 
@@ -216,12 +204,16 @@ annotateContract contract =
         When xs t y ->
             AnnoWhen
                 (xs |> List.map annotateCase)
-                t
+                (annotateNum t)
                 (annotateContract y)
                 U.unique
 
         Let id val a ->
-            AnnoRefund U.unique
+            AnnoLet
+                (annotateNum id)
+                (annotateValue val)
+                (annotateContract a)
+                U.unique
 
 
 annotateValue : Value Observation -> AnnoValue AnnoObservation
@@ -231,10 +223,14 @@ annotateValue val =
             AnnoAvailableMoney U.unique
 
         Constant num ->
-            AnnoConstant num U.unique
+            AnnoConstant
+                (annotateNum num)
+                U.unique
 
         NegValue v ->
-            AnnoNegValue (annotateValue v) U.unique
+            AnnoNegValue
+                (annotateValue v)
+                U.unique
 
         AddValue v1 v2 ->
             AnnoAddValue
@@ -342,13 +338,15 @@ annotateAction : Action -> AnnoAction
 annotateAction act =
     case act of
         Deposit id str v ->
-            AnnoDeposit (annotateAccountId id)
-                str
+            AnnoDeposit
+                (annotateAccountId id)
+                (annotateString str)
                 (annotateValue v)
                 U.unique
 
         Choice id xs ->
-            AnnoChoice (annotateChoiceId id)
+            AnnoChoice
+                (annotateChoiceId id)
                 (xs |> List.map annotateBound)
                 U.unique
 
@@ -358,24 +356,34 @@ annotateAction act =
 
 annotateCase : Case Action Contract -> AnnoCase AnnoAction AnnoContract
 annotateCase (Case a c) =
-    AnnoCase (annotateAction a)
+    AnnoCase
+        (annotateAction a)
         (annotateContract c)
         U.unique
 
 
 annotateChoiceId : ChoiceId -> AnnoChoiceId
 annotateChoiceId (ChoiceId s1 s2) =
-    AnnoChoiceId s1 s2 U.unique
+    AnnoChoiceId
+        (annotateString s1)
+        (annotateString s2)
+        U.unique
 
 
 annotateRational : Rational -> AnnoRational
 annotateRational (Rational n1 n2) =
-    AnnoRational n1 n2 U.unique
+    AnnoRational
+        (annotateNum n1)
+        (annotateNum n2)
+        U.unique
 
 
 annotateAccountId : AccountId -> AnnoAccountId
 annotateAccountId (AccountId num str) =
-    AnnoAccountId num str U.unique
+    AnnoAccountId
+        (annotateNum num)
+        (annotateString str)
+        U.unique
 
 
 annotatePayee : Payee -> AnnoPayee
@@ -387,12 +395,25 @@ annotatePayee p =
                 U.unique
 
         Party str ->
-            AnnoParty str U.unique
+            AnnoParty (annotateString str) U.unique
 
 
 annotateBound : Bound -> AnnoBound
 annotateBound (Bound i j) =
-    AnnoBound i j U.unique
+    AnnoBound
+        (annotateNum i)
+        (annotateNum j)
+        U.unique
+
+
+annotateNum : Int -> AnnoNum
+annotateNum n =
+    AnnoNum n U.unique
+
+
+annotateString : String -> AnnoString
+annotateString s =
+    AnnoString s U.unique
 
 
 

@@ -5982,6 +5982,437 @@ var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 };
 var $mdgriffith$elm_ui$Internal$Model$Right = 2;
 var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX(2);
+var $author$project$Marlowe$Semantics$AnnoCase = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoIf = F4(
+	function (a, b, c, d) {
+		return {$: 2, a: a, b: b, c: c, d: d};
+	});
+var $author$project$Marlowe$Semantics$AnnoLet = F4(
+	function (a, b, c, d) {
+		return {$: 4, a: a, b: b, c: c, d: d};
+	});
+var $author$project$Marlowe$Semantics$AnnoPay = F5(
+	function (a, b, c, d, e) {
+		return {$: 1, a: a, b: b, c: c, d: d, e: e};
+	});
+var $author$project$Marlowe$Semantics$AnnoRefund = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Marlowe$Semantics$AnnoWhen = F4(
+	function (a, b, c, d) {
+		return {$: 3, a: a, b: b, c: c, d: d};
+	});
+var $author$project$Marlowe$Semantics$AnnoAccountId = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoNum = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $league$unique_id$Unique$U = $elm$core$Basics$identity;
+var $league$unique_id$Unique$Id = $elm$core$Basics$identity;
+var $league$unique_id$Unique$next = function (_v0) {
+	var n = _v0;
+	return n + 1;
+};
+var $league$unique_id$Unique$unique = function (k) {
+	return _Utils_Tuple2(
+		k,
+		$league$unique_id$Unique$next(k));
+};
+var $author$project$Marlowe$Semantics$annotateNum = function (n) {
+	return A2($author$project$Marlowe$Semantics$AnnoNum, n, $league$unique_id$Unique$unique);
+};
+var $author$project$Marlowe$Semantics$AnnoString = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$annotateString = function (s) {
+	return A2($author$project$Marlowe$Semantics$AnnoString, s, $league$unique_id$Unique$unique);
+};
+var $author$project$Marlowe$Semantics$annotateAccountId = function (_v0) {
+	var num = _v0.a;
+	var str = _v0.b;
+	return A3(
+		$author$project$Marlowe$Semantics$AnnoAccountId,
+		$author$project$Marlowe$Semantics$annotateNum(num),
+		$author$project$Marlowe$Semantics$annotateString(str),
+		$league$unique_id$Unique$unique);
+};
+var $author$project$Marlowe$Semantics$AnnoChoice = F3(
+	function (a, b, c) {
+		return {$: 1, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoDeposit = F4(
+	function (a, b, c, d) {
+		return {$: 0, a: a, b: b, c: c, d: d};
+	});
+var $author$project$Marlowe$Semantics$AnnoNotify = F2(
+	function (a, b) {
+		return {$: 2, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$AnnoBound = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$annotateBound = function (_v0) {
+	var i = _v0.a;
+	var j = _v0.b;
+	return A3(
+		$author$project$Marlowe$Semantics$AnnoBound,
+		$author$project$Marlowe$Semantics$annotateNum(i),
+		$author$project$Marlowe$Semantics$annotateNum(j),
+		$league$unique_id$Unique$unique);
+};
+var $author$project$Marlowe$Semantics$AnnoChoiceId = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$annotateChoiceId = function (_v0) {
+	var s1 = _v0.a;
+	var s2 = _v0.b;
+	return A3(
+		$author$project$Marlowe$Semantics$AnnoChoiceId,
+		$author$project$Marlowe$Semantics$annotateString(s1),
+		$author$project$Marlowe$Semantics$annotateString(s2),
+		$league$unique_id$Unique$unique);
+};
+var $author$project$Marlowe$Semantics$AnnoAndObs = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoChooseSomething = F2(
+	function (a, b) {
+		return {$: 3, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$AnnoFalseObs = function (a) {
+	return {$: 10, a: a};
+};
+var $author$project$Marlowe$Semantics$AnnoNotObs = F2(
+	function (a, b) {
+		return {$: 2, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$AnnoOrObs = F3(
+	function (a, b, c) {
+		return {$: 1, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoTrueObs = function (a) {
+	return {$: 9, a: a};
+};
+var $author$project$Marlowe$Semantics$AnnoValueEQ = F3(
+	function (a, b, c) {
+		return {$: 8, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoValueGE = F3(
+	function (a, b, c) {
+		return {$: 4, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoValueGT = F3(
+	function (a, b, c) {
+		return {$: 5, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoValueLE = F3(
+	function (a, b, c) {
+		return {$: 7, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoValueLT = F3(
+	function (a, b, c) {
+		return {$: 6, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoAddValue = F3(
+	function (a, b, c) {
+		return {$: 3, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoAvailableMoney = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Marlowe$Semantics$AnnoConstant = F2(
+	function (a, b) {
+		return {$: 1, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$AnnoMulValue = F3(
+	function (a, b, c) {
+		return {$: 5, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoNegValue = F2(
+	function (a, b) {
+		return {$: 2, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$AnnoScale = F3(
+	function (a, b, c) {
+		return {$: 6, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoSubValue = F3(
+	function (a, b, c) {
+		return {$: 4, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$AnnoRational = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $author$project$Marlowe$Semantics$annotateRational = function (_v0) {
+	var n1 = _v0.a;
+	var n2 = _v0.b;
+	return A3(
+		$author$project$Marlowe$Semantics$AnnoRational,
+		$author$project$Marlowe$Semantics$annotateNum(n1),
+		$author$project$Marlowe$Semantics$annotateNum(n2),
+		$league$unique_id$Unique$unique);
+};
+var $author$project$Marlowe$Semantics$annotateValue = function (val) {
+	switch (val.$) {
+		case 0:
+			return $author$project$Marlowe$Semantics$AnnoAvailableMoney($league$unique_id$Unique$unique);
+		case 1:
+			var num = val.a;
+			return A2(
+				$author$project$Marlowe$Semantics$AnnoConstant,
+				$author$project$Marlowe$Semantics$annotateNum(num),
+				$league$unique_id$Unique$unique);
+		case 2:
+			var v = val.a;
+			return A2(
+				$author$project$Marlowe$Semantics$AnnoNegValue,
+				$author$project$Marlowe$Semantics$annotateValue(v),
+				$league$unique_id$Unique$unique);
+		case 3:
+			var v1 = val.a;
+			var v2 = val.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoAddValue,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 4:
+			var v1 = val.a;
+			var v2 = val.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoSubValue,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 5:
+			var v1 = val.a;
+			var v2 = val.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoMulValue,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 6:
+			var rat = val.a;
+			var v = val.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoScale,
+				$author$project$Marlowe$Semantics$annotateRational(rat),
+				$author$project$Marlowe$Semantics$annotateValue(v),
+				$league$unique_id$Unique$unique);
+		case 7:
+			var id = val.a;
+			var v = val.b;
+			return $author$project$Marlowe$Semantics$AnnoAvailableMoney($league$unique_id$Unique$unique);
+		case 8:
+			return $author$project$Marlowe$Semantics$AnnoAvailableMoney($league$unique_id$Unique$unique);
+		case 9:
+			return $author$project$Marlowe$Semantics$AnnoAvailableMoney($league$unique_id$Unique$unique);
+		case 10:
+			var id = val.a;
+			return $author$project$Marlowe$Semantics$AnnoAvailableMoney($league$unique_id$Unique$unique);
+		default:
+			var o = val.a;
+			var a = val.b;
+			var b = val.c;
+			return $author$project$Marlowe$Semantics$AnnoAvailableMoney($league$unique_id$Unique$unique);
+	}
+};
+var $author$project$Marlowe$Semantics$annotateObservation = function (obs) {
+	switch (obs.$) {
+		case 0:
+			var o1 = obs.a;
+			var o2 = obs.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoAndObs,
+				$author$project$Marlowe$Semantics$annotateObservation(o1),
+				$author$project$Marlowe$Semantics$annotateObservation(o2),
+				$league$unique_id$Unique$unique);
+		case 1:
+			var o1 = obs.a;
+			var o2 = obs.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoOrObs,
+				$author$project$Marlowe$Semantics$annotateObservation(o1),
+				$author$project$Marlowe$Semantics$annotateObservation(o2),
+				$league$unique_id$Unique$unique);
+		case 2:
+			var o = obs.a;
+			return A2(
+				$author$project$Marlowe$Semantics$AnnoNotObs,
+				$author$project$Marlowe$Semantics$annotateObservation(o),
+				$league$unique_id$Unique$unique);
+		case 3:
+			var id = obs.a;
+			return A2(
+				$author$project$Marlowe$Semantics$AnnoChooseSomething,
+				$author$project$Marlowe$Semantics$annotateChoiceId(id),
+				$league$unique_id$Unique$unique);
+		case 4:
+			var v1 = obs.a;
+			var v2 = obs.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoValueGE,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 5:
+			var v1 = obs.a;
+			var v2 = obs.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoValueGT,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 6:
+			var v1 = obs.a;
+			var v2 = obs.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoValueLT,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 7:
+			var v1 = obs.a;
+			var v2 = obs.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoValueLE,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 8:
+			var v1 = obs.a;
+			var v2 = obs.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoValueEQ,
+				$author$project$Marlowe$Semantics$annotateValue(v1),
+				$author$project$Marlowe$Semantics$annotateValue(v2),
+				$league$unique_id$Unique$unique);
+		case 9:
+			return $author$project$Marlowe$Semantics$AnnoTrueObs($league$unique_id$Unique$unique);
+		default:
+			return $author$project$Marlowe$Semantics$AnnoFalseObs($league$unique_id$Unique$unique);
+	}
+};
+var $author$project$Marlowe$Semantics$annotateAction = function (act) {
+	switch (act.$) {
+		case 0:
+			var id = act.a;
+			var str = act.b;
+			var v = act.c;
+			return A4(
+				$author$project$Marlowe$Semantics$AnnoDeposit,
+				$author$project$Marlowe$Semantics$annotateAccountId(id),
+				$author$project$Marlowe$Semantics$annotateString(str),
+				$author$project$Marlowe$Semantics$annotateValue(v),
+				$league$unique_id$Unique$unique);
+		case 1:
+			var id = act.a;
+			var xs = act.b;
+			return A3(
+				$author$project$Marlowe$Semantics$AnnoChoice,
+				$author$project$Marlowe$Semantics$annotateChoiceId(id),
+				A2($elm$core$List$map, $author$project$Marlowe$Semantics$annotateBound, xs),
+				$league$unique_id$Unique$unique);
+		default:
+			var o = act.a;
+			return A2(
+				$author$project$Marlowe$Semantics$AnnoNotify,
+				$author$project$Marlowe$Semantics$annotateObservation(o),
+				$league$unique_id$Unique$unique);
+	}
+};
+var $author$project$Marlowe$Semantics$AnnoAccount = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$AnnoParty = F2(
+	function (a, b) {
+		return {$: 1, a: a, b: b};
+	});
+var $author$project$Marlowe$Semantics$annotatePayee = function (p) {
+	if (!p.$) {
+		var id = p.a;
+		return A2(
+			$author$project$Marlowe$Semantics$AnnoAccount,
+			$author$project$Marlowe$Semantics$annotateAccountId(id),
+			$league$unique_id$Unique$unique);
+	} else {
+		var str = p.a;
+		return A2(
+			$author$project$Marlowe$Semantics$AnnoParty,
+			$author$project$Marlowe$Semantics$annotateString(str),
+			$league$unique_id$Unique$unique);
+	}
+};
+var $author$project$Marlowe$Semantics$annotateCase = function (_v1) {
+	var a = _v1.a;
+	var c = _v1.b;
+	return A3(
+		$author$project$Marlowe$Semantics$AnnoCase,
+		$author$project$Marlowe$Semantics$annotateAction(a),
+		$author$project$Marlowe$Semantics$annotateContract(c),
+		$league$unique_id$Unique$unique);
+};
+var $author$project$Marlowe$Semantics$annotateContract = function (contract) {
+	switch (contract.$) {
+		case 0:
+			return $author$project$Marlowe$Semantics$AnnoRefund($league$unique_id$Unique$unique);
+		case 1:
+			var p1 = contract.a;
+			var p2 = contract.b;
+			var v = contract.c;
+			var c = contract.d;
+			return A5(
+				$author$project$Marlowe$Semantics$AnnoPay,
+				$author$project$Marlowe$Semantics$annotateAccountId(p1),
+				$author$project$Marlowe$Semantics$annotatePayee(p2),
+				$author$project$Marlowe$Semantics$annotateValue(v),
+				$author$project$Marlowe$Semantics$annotateContract(c),
+				$league$unique_id$Unique$unique);
+		case 2:
+			var o = contract.a;
+			var a = contract.b;
+			var b = contract.c;
+			return A4(
+				$author$project$Marlowe$Semantics$AnnoIf,
+				$author$project$Marlowe$Semantics$annotateObservation(o),
+				$author$project$Marlowe$Semantics$annotateContract(a),
+				$author$project$Marlowe$Semantics$annotateContract(b),
+				$league$unique_id$Unique$unique);
+		case 3:
+			var xs = contract.a;
+			var t = contract.b;
+			var y = contract.c;
+			return A4(
+				$author$project$Marlowe$Semantics$AnnoWhen,
+				A2($elm$core$List$map, $author$project$Marlowe$Semantics$annotateCase, xs),
+				$author$project$Marlowe$Semantics$annotateNum(t),
+				$author$project$Marlowe$Semantics$annotateContract(y),
+				$league$unique_id$Unique$unique);
+		default:
+			var id = contract.a;
+			var val = contract.b;
+			var a = contract.c;
+			return A4(
+				$author$project$Marlowe$Semantics$AnnoLet,
+				$author$project$Marlowe$Semantics$annotateNum(id),
+				$author$project$Marlowe$Semantics$annotateValue(val),
+				$author$project$Marlowe$Semantics$annotateContract(a),
+				$league$unique_id$Unique$unique);
+	}
+};
 var $mdgriffith$elm_ui$Internal$Model$Below = 1;
 var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
 	function (a, b) {
@@ -11976,8 +12407,8 @@ var $mdgriffith$elm_ui$Element$Border$width = function (v) {
 			v,
 			v));
 };
-var $author$project$Main$singletonHeader = F3(
-	function (blink, color, label) {
+var $author$project$Main$singletonHeader = F4(
+	function (blink, color, label, anno) {
 		return A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
@@ -11991,17 +12422,26 @@ var $author$project$Main$singletonHeader = F3(
 			$mdgriffith$elm_ui$Element$text(label));
 	});
 var $author$project$Main$genNumberView = F2(
-	function (blink, num) {
-		return A3(
+	function (blink, _v0) {
+		var num = _v0.a;
+		var anno = _v0.b;
+		return A4(
 			$author$project$Main$singletonHeader,
 			blink,
 			$author$project$Highlight$numColor,
-			$elm$core$String$fromInt(num));
+			$elm$core$String$fromInt(num),
+			anno);
 	});
 var $author$project$Highlight$string = A3($mdgriffith$elm_ui$Element$rgb, 0, 0.5, 0.2);
 var $author$project$Main$genStringView = F2(
-	function (blink, str) {
-		return A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$string, '\"' + (str + '\"'));
+	function (blink, _v0) {
+		var str = _v0.a;
+		var anno = _v0.b;
+		return A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$string, '\"' + (str + '\"'), anno);
+	});
+var $author$project$Main$genPartyView = F2(
+	function (blink, name) {
+		return A2($author$project$Main$genStringView, blink, name);
 	});
 var $author$project$Main$corners = {aT: 0, ax: 0, aL: 0, as: 0};
 var $mdgriffith$elm_ui$Element$Border$roundEach = function (_v0) {
@@ -12047,23 +12487,24 @@ var $mdgriffith$elm_ui$Element$Border$widthEach = function (_v0) {
 			bottom,
 			left));
 };
-var $author$project$Main$midHeader = function (label) {
-	return A2(
-		$mdgriffith$elm_ui$Element$el,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$Border$widthEach(
-				_Utils_update(
-					$author$project$Main$edges,
-					{M: $author$project$Main$borderWidth, aI: $author$project$Main$borderWidth, Z: $author$project$Main$borderWidth})),
-				$mdgriffith$elm_ui$Element$Border$roundEach(
-				_Utils_update(
-					$author$project$Main$corners,
-					{ax: $author$project$Main$margin, as: $author$project$Main$margin})),
-				A2($mdgriffith$elm_ui$Element$paddingXY, $author$project$Main$gap * 2, $author$project$Main$gap)
-			]),
-		$mdgriffith$elm_ui$Element$text(label));
-};
+var $author$project$Main$midHeader = F2(
+	function (label, anno) {
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Border$widthEach(
+					_Utils_update(
+						$author$project$Main$edges,
+						{M: $author$project$Main$borderWidth, aI: $author$project$Main$borderWidth, Z: $author$project$Main$borderWidth})),
+					$mdgriffith$elm_ui$Element$Border$roundEach(
+					_Utils_update(
+						$author$project$Main$corners,
+						{ax: $author$project$Main$margin, as: $author$project$Main$margin})),
+					A2($mdgriffith$elm_ui$Element$paddingXY, $author$project$Main$gap * 2, $author$project$Main$gap)
+				]),
+			$mdgriffith$elm_ui$Element$text(label));
+	});
 var $author$project$Main$scopeBlock = F3(
 	function (blink, color, elems) {
 		return A2(
@@ -12130,7 +12571,7 @@ var $author$project$Main$subScope = function (elem) {
 			]),
 		elem);
 };
-var $author$project$Main$topHeader = function (label) {
+var $author$project$Main$topHeaderPlain = function (label) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
 		_List_fromArray(
@@ -12147,22 +12588,27 @@ var $author$project$Main$topHeader = function (label) {
 			]),
 		$mdgriffith$elm_ui$Element$text(label));
 };
+var $author$project$Main$topHeader = F2(
+	function (label, anno) {
+		return $author$project$Main$topHeaderPlain(label);
+	});
 var $author$project$Main$genAccountIdView = F2(
 	function (blink, _v0) {
 		var num = _v0.a;
 		var owner = _v0.b;
+		var anno = _v0.c;
 		return A3(
 			$author$project$Main$scopeBlock,
 			blink,
 			$author$project$Highlight$accountId,
 			_List_fromArray(
 				[
-					$author$project$Main$topHeader('Account'),
+					A2($author$project$Main$topHeader, 'Account', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genNumberView, blink, num)),
-					$author$project$Main$midHeader('with owner'),
+					A2($author$project$Main$midHeader, 'with owner', anno),
 					$author$project$Main$subScope(
-					A2($author$project$Main$genStringView, blink, owner))
+					A2($author$project$Main$genPartyView, blink, owner))
 				]));
 	});
 var $author$project$Highlight$bounds = A3($mdgriffith$elm_ui$Element$rgb, 0.6, 0.3, 0.15);
@@ -12171,64 +12617,68 @@ var $author$project$Main$genBoundsView = F2(
 	function (blink, _v0) {
 		var a = _v0.a;
 		var b = _v0.b;
+		var anno = _v0.c;
 		return A3(
 			$author$project$Main$scopeBlock,
 			blink,
 			$author$project$Highlight$bounds,
 			_List_fromArray(
 				[
-					$author$project$Main$topHeader('Between'),
+					A2($author$project$Main$topHeader, 'Between', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genNumberView, blink, a)),
-					$author$project$Main$midHeader('and'),
+					A2($author$project$Main$midHeader, 'and', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genNumberView, blink, b))
 				]));
 	});
-var $author$project$Highlight$andOr = A3($mdgriffith$elm_ui$Element$rgb, 0.4, 0.5, 1);
-var $author$project$Highlight$chooseSomething = A3($mdgriffith$elm_ui$Element$rgb, 0.32, 0.4, 0.8);
-var $author$project$Main$endHeader = function (label) {
-	return A2(
-		$mdgriffith$elm_ui$Element$el,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$Border$widthEach(
-				_Utils_update(
-					$author$project$Main$edges,
-					{M: $author$project$Main$borderWidth, aI: $author$project$Main$borderWidth, Z: $author$project$Main$borderWidth})),
-				$mdgriffith$elm_ui$Element$Border$roundEach(
-				_Utils_update(
-					$author$project$Main$corners,
-					{aT: $author$project$Main$margin, ax: $author$project$Main$margin, as: $author$project$Main$margin})),
-				A2($mdgriffith$elm_ui$Element$paddingXY, $author$project$Main$margin * 2, $author$project$Main$margin)
-			]),
-		$mdgriffith$elm_ui$Element$text(label));
-};
-var $author$project$Highlight$falseObs = A3($mdgriffith$elm_ui$Element$rgb, 0.2, 0.25, 0.5);
 var $author$project$Highlight$choiceId = A3($mdgriffith$elm_ui$Element$rgb, 0.3, 0.6, 0.15);
 var $author$project$Main$genChoiceIdView = F2(
 	function (blink, _v0) {
 		var choice = _v0.a;
 		var owner = _v0.b;
+		var anno = _v0.c;
 		return A3(
 			$author$project$Main$scopeBlock,
 			blink,
 			$author$project$Highlight$choiceId,
 			_List_fromArray(
 				[
-					$author$project$Main$topHeader('A value identified by'),
+					A2($author$project$Main$topHeader, 'A value identified by', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genStringView, blink, choice)),
-					$author$project$Main$midHeader('with owner'),
+					A2($author$project$Main$midHeader, 'with owner', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genStringView, blink, owner))
 				]));
 	});
+var $author$project$Highlight$andOr = A3($mdgriffith$elm_ui$Element$rgb, 0.4, 0.5, 1);
+var $author$project$Highlight$chooseSomething = A3($mdgriffith$elm_ui$Element$rgb, 0.32, 0.4, 0.8);
+var $author$project$Main$endHeader = F2(
+	function (label, anno) {
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Border$widthEach(
+					_Utils_update(
+						$author$project$Main$edges,
+						{M: $author$project$Main$borderWidth, aI: $author$project$Main$borderWidth, Z: $author$project$Main$borderWidth})),
+					$mdgriffith$elm_ui$Element$Border$roundEach(
+					_Utils_update(
+						$author$project$Main$corners,
+						{aT: $author$project$Main$margin, ax: $author$project$Main$margin, as: $author$project$Main$margin})),
+					A2($mdgriffith$elm_ui$Element$paddingXY, $author$project$Main$margin * 2, $author$project$Main$margin)
+				]),
+			$mdgriffith$elm_ui$Element$text(label));
+	});
+var $author$project$Highlight$falseObs = A3($mdgriffith$elm_ui$Element$rgb, 0.2, 0.25, 0.5);
 var $author$project$Highlight$rational = A3($mdgriffith$elm_ui$Element$rgb, 0.6, 0.8, 0.2);
 var $author$project$Main$genRationalView = F2(
 	function (blink, _v0) {
 		var n = _v0.a;
 		var d = _v0.b;
+		var anno = _v0.c;
 		return A3(
 			$author$project$Main$scopeBlock,
 			blink,
@@ -12237,7 +12687,7 @@ var $author$project$Main$genRationalView = F2(
 				[
 					$author$project$Main$subScope(
 					A2($author$project$Main$genNumberView, blink, n)),
-					$author$project$Main$midHeader('over'),
+					A2($author$project$Main$midHeader, 'over', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genNumberView, blink, d))
 				]));
@@ -12256,6 +12706,7 @@ var $author$project$Main$genObservationView = F2(
 			case 0:
 				var o1 = obs.a;
 				var o2 = obs.b;
+				var anno = obs.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12264,13 +12715,14 @@ var $author$project$Main$genObservationView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, o1)),
-							$author$project$Main$midHeader('and'),
+							A2($author$project$Main$midHeader, 'and', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, o2))
 						]));
 			case 1:
 				var o1 = obs.a;
 				var o2 = obs.b;
+				var anno = obs.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12279,37 +12731,40 @@ var $author$project$Main$genObservationView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, o1)),
-							$author$project$Main$midHeader('or'),
+							A2($author$project$Main$midHeader, 'or', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, o2))
 						]));
 			case 2:
 				var o = obs.a;
+				var anno = obs.b;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$notColor,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('not'),
+							A2($author$project$Main$topHeader, 'not', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, o))
 						]));
 			case 3:
 				var id = obs.a;
+				var anno = obs.b;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$chooseSomething,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('The choice'),
+							A2($author$project$Main$topHeader, 'The choice', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genChoiceIdView, blink, id))
 						]));
 			case 4:
 				var v1 = obs.a;
 				var v2 = obs.b;
+				var anno = obs.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12318,13 +12773,14 @@ var $author$project$Main$genObservationView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('is greater than or equal to'),
+							A2($author$project$Main$midHeader, 'is greater than or equal to', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 5:
 				var v1 = obs.a;
 				var v2 = obs.b;
+				var anno = obs.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12333,13 +12789,14 @@ var $author$project$Main$genObservationView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('is greater than'),
+							A2($author$project$Main$midHeader, 'is greater than', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 6:
 				var v1 = obs.a;
 				var v2 = obs.b;
+				var anno = obs.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12348,13 +12805,14 @@ var $author$project$Main$genObservationView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('is less than'),
+							A2($author$project$Main$midHeader, 'is less than', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 7:
 				var v1 = obs.a;
 				var v2 = obs.b;
+				var anno = obs.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12363,13 +12821,14 @@ var $author$project$Main$genObservationView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('is less than or equal to'),
+							A2($author$project$Main$midHeader, 'is less than or equal to', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 8:
 				var v1 = obs.a;
 				var v2 = obs.b;
+				var anno = obs.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12378,43 +12837,45 @@ var $author$project$Main$genObservationView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('is equal to'),
+							A2($author$project$Main$midHeader, 'is equal to', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 9:
-				return A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$trueObs, 'True');
+				var anno = obs.a;
+				return A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$trueObs, 'True', anno);
 			default:
-				return A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$falseObs, 'False');
+				var anno = obs.a;
+				return A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$falseObs, 'False', anno);
 		}
 	});
 var $author$project$Main$genValueView = F2(
 	function (blink, val) {
 		switch (val.$) {
 			case 0:
-				return A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$value, 'Available Money');
+				var anno = val.a;
+				return A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$value, 'Available Money', anno);
 			case 1:
 				var num = val.a;
-				return A3(
-					$author$project$Main$singletonHeader,
-					blink,
-					$author$project$Highlight$value,
-					$elm$core$String$fromInt(num));
+				var anno = val.b;
+				return A2($author$project$Main$genNumberView, blink, num);
 			case 2:
 				var v = val.a;
+				var anno = val.b;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$value,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('negative'),
+							A2($author$project$Main$topHeader, 'negative', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v))
 						]));
 			case 3:
 				var v1 = val.a;
 				var v2 = val.b;
+				var anno = val.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12423,13 +12884,14 @@ var $author$project$Main$genValueView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('plus'),
+							A2($author$project$Main$midHeader, 'plus', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 4:
 				var v1 = val.a;
 				var v2 = val.b;
+				var anno = val.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12438,13 +12900,14 @@ var $author$project$Main$genValueView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('minus'),
+							A2($author$project$Main$midHeader, 'minus', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 5:
 				var v1 = val.a;
 				var v2 = val.b;
+				var anno = val.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
@@ -12453,56 +12916,61 @@ var $author$project$Main$genValueView = F2(
 						[
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v1)),
-							$author$project$Main$midHeader('times'),
+							A2($author$project$Main$midHeader, 'times', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v2))
 						]));
 			case 6:
 				var rat = val.a;
 				var v = val.b;
+				var anno = val.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$value,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('Scale by'),
+							A2($author$project$Main$topHeader, 'Scale by', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genRationalView, blink, rat)),
-							$author$project$Main$midHeader('the value'),
+							A2($author$project$Main$midHeader, 'the value', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v))
 						]));
 			case 7:
 				var id = val.a;
 				var v = val.b;
+				var anno = val.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$value,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('A choice with'),
+							A2($author$project$Main$topHeader, 'A choice with', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genChoiceIdView, blink, id)),
-							$author$project$Main$midHeader('defaulting to'),
+							A2($author$project$Main$midHeader, 'defaulting to', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v)),
-							$author$project$Main$endHeader('if no value is given')
+							A2($author$project$Main$endHeader, 'if no value is given', anno)
 						]));
 			case 8:
-				return A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$value, 'Start of slot interval');
+				var anno = val.a;
+				return A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$value, 'Start of slot interval', anno);
 			case 9:
-				return A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$value, 'End of slot interval');
+				var anno = val.a;
+				return A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$value, 'End of slot interval', anno);
 			case 10:
 				var id = val.a;
+				var anno = val.b;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$value,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('Use value with identity'),
+							A2($author$project$Main$topHeader, 'Use value with identity', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genNumberView, blink, id))
 						]));
@@ -12510,19 +12978,20 @@ var $author$project$Main$genValueView = F2(
 				var o = val.a;
 				var a = val.b;
 				var b = val.c;
+				var anno = val.d;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$value,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('If it\'s observed that'),
+							A2($author$project$Main$topHeader, 'If it\'s observed that', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, o)),
-							$author$project$Main$midHeader('then use the value'),
+							A2($author$project$Main$midHeader, 'then use the value', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, a)),
-							$author$project$Main$midHeader('otherwise use'),
+							A2($author$project$Main$midHeader, 'otherwise use', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, b))
 						]));
@@ -12536,40 +13005,37 @@ var $author$project$Main$genActionView = F2(
 				var id = action.a;
 				var str = action.b;
 				var val = action.c;
+				var anno = action.d;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$deposit,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('Deposit to'),
+							A2($author$project$Main$topHeader, 'Deposit to', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genAccountIdView, blink, id)),
-							$author$project$Main$midHeader('from wallet of'),
+							A2($author$project$Main$midHeader, 'from wallet of', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genStringView, blink, str)),
-							$author$project$Main$midHeader('the amount of'),
+							A2($author$project$Main$midHeader, 'the amount of', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, val))
 						]));
 			case 1:
-				var _v1 = action.a;
-				var name = _v1.a;
-				var owner = _v1.b;
+				var choice = action.a;
 				var bounds = action.b;
+				var anno = action.c;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$deposit,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('A choice called'),
+							A2($author$project$Main$topHeader, 'A choice', anno),
 							$author$project$Main$subScope(
-							A2($author$project$Main$genStringView, blink, name)),
-							$author$project$Main$midHeader('was made by'),
-							$author$project$Main$subScope(
-							A2($author$project$Main$genStringView, blink, owner)),
-							$author$project$Main$midHeader('with bounds'),
+							A2($author$project$Main$genChoiceIdView, blink, choice)),
+							A2($author$project$Main$midHeader, 'with bounds', anno),
 							A2(
 							$mdgriffith$elm_ui$Element$column,
 							_List_fromArray(
@@ -12584,17 +13050,18 @@ var $author$project$Main$genActionView = F2(
 								$author$project$Main$genBoundsView(blink),
 								bounds)),
 							$author$project$Main$subScope(
-							A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$bounds, '...'))
+							A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$bounds, '...', anno))
 						]));
 			default:
 				var obs = action.a;
+				var anno = action.b;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$notify,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('Notify when'),
+							A2($author$project$Main$topHeader, 'Notify when', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, obs))
 						]));
@@ -12604,10 +13071,12 @@ var $author$project$Main$genPayeeView = F2(
 	function (blink, payee) {
 		if (!payee.$) {
 			var id = payee.a;
+			var anno = payee.b;
 			return A2($author$project$Main$genAccountIdView, blink, id);
 		} else {
 			var name = payee.a;
-			return A2($author$project$Main$genStringView, blink, name);
+			var anno = payee.b;
+			return A2($author$project$Main$genPartyView, blink, name);
 		}
 	});
 var $author$project$Highlight$ifColor = A3($mdgriffith$elm_ui$Element$rgb, 1, 0.4, 0);
@@ -12618,16 +13087,17 @@ var $author$project$Main$genCaseView = F2(
 	function (blink, _v1) {
 		var a = _v1.a;
 		var c = _v1.b;
+		var anno = _v1.c;
 		return A3(
 			$author$project$Main$scopeBlock,
 			blink,
 			$author$project$Highlight$caseColor,
 			_List_fromArray(
 				[
-					$author$project$Main$topHeader('Case of action'),
+					A2($author$project$Main$topHeader, 'Case of action', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genActionView, blink, a)),
-					$author$project$Main$midHeader('do contract'),
+					A2($author$project$Main$midHeader, 'do contract', anno),
 					$author$project$Main$subScope(
 					A2($author$project$Main$genContractView, blink, c))
 				]));
@@ -12636,28 +13106,30 @@ var $author$project$Main$genContractView = F2(
 	function (blink, contract) {
 		switch (contract.$) {
 			case 0:
-				return A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$refund, 'Refund remaining');
+				var anno = contract.a;
+				return A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$refund, 'Refund remaining', anno);
 			case 1:
 				var p1 = contract.a;
 				var p2 = contract.b;
 				var v = contract.c;
 				var a = contract.d;
+				var anno = contract.e;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$pay,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('Pay from'),
+							A2($author$project$Main$topHeader, 'Pay from', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genAccountIdView, blink, p1)),
-							$author$project$Main$midHeader('to'),
+							A2($author$project$Main$midHeader, 'to', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genPayeeView, blink, p2)),
-							$author$project$Main$midHeader('the amount of'),
+							A2($author$project$Main$midHeader, 'the amount of', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, v)),
-							$author$project$Main$midHeader('and continue with'),
+							A2($author$project$Main$midHeader, 'and continue with', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genContractView, blink, a))
 						]));
@@ -12665,19 +13137,20 @@ var $author$project$Main$genContractView = F2(
 				var o = contract.a;
 				var a = contract.b;
 				var b = contract.c;
+				var anno = contract.d;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$ifColor,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('If'),
+							A2($author$project$Main$topHeader, 'If', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genObservationView, blink, o)),
-							$author$project$Main$midHeader('then'),
+							A2($author$project$Main$midHeader, 'then', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genContractView, blink, a)),
-							$author$project$Main$midHeader('else'),
+							A2($author$project$Main$midHeader, 'else', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genContractView, blink, b))
 						]));
@@ -12685,13 +13158,14 @@ var $author$project$Main$genContractView = F2(
 				var cases = contract.a;
 				var t = contract.b;
 				var y = contract.c;
+				var anno = contract.d;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$contractColor,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('When'),
+							A2($author$project$Main$topHeader, 'When', anno),
 							A2(
 							$mdgriffith$elm_ui$Element$column,
 							_List_fromArray(
@@ -12706,11 +13180,11 @@ var $author$project$Main$genContractView = F2(
 								$author$project$Main$genCaseView(blink),
 								cases)),
 							$author$project$Main$subScope(
-							A3($author$project$Main$singletonHeader, blink, $author$project$Highlight$caseColor, '...')),
-							$author$project$Main$midHeader('after slot'),
+							A4($author$project$Main$singletonHeader, blink, $author$project$Highlight$caseColor, '...', anno)),
+							A2($author$project$Main$midHeader, 'after slot', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genNumberView, blink, t)),
-							$author$project$Main$midHeader('continue as'),
+							A2($author$project$Main$midHeader, 'continue as', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genContractView, blink, y))
 						]));
@@ -12718,19 +13192,20 @@ var $author$project$Main$genContractView = F2(
 				var id = contract.a;
 				var val = contract.b;
 				var a = contract.c;
+				var anno = contract.d;
 				return A3(
 					$author$project$Main$scopeBlock,
 					blink,
 					$author$project$Highlight$letColor,
 					_List_fromArray(
 						[
-							$author$project$Main$topHeader('Let the number'),
+							A2($author$project$Main$topHeader, 'Let the number', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genNumberView, blink, id)),
-							$author$project$Main$midHeader('identify the value'),
+							A2($author$project$Main$midHeader, 'identify the value', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genValueView, blink, val)),
-							$author$project$Main$midHeader('in'),
+							A2($author$project$Main$midHeader, 'in', anno),
 							$author$project$Main$subScope(
 							A2($author$project$Main$genContractView, blink, a))
 						]));
@@ -13486,7 +13961,13 @@ var $author$project$Main$sampleButton = F2(
 	function (c, s) {
 		return A2(
 			$mdgriffith$elm_ui$Element$Input$button,
-			_List_Nil,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					$mdgriffith$elm_ui$Element$Border$width($author$project$Main$borderWidth),
+					$mdgriffith$elm_ui$Element$Border$rounded($author$project$Main$margin),
+					$mdgriffith$elm_ui$Element$padding($author$project$Main$margin)
+				]),
 			{
 				cT: $mdgriffith$elm_ui$Element$text(s),
 				c0: $elm$core$Maybe$Just(
@@ -13615,9 +14096,12 @@ var $author$project$Main$view = function (model) {
 								$author$project$Highlight$contractBase,
 								_List_fromArray(
 									[
-										$author$project$Main$topHeader('Contract such that'),
+										$author$project$Main$topHeaderPlain('Contract such that'),
 										$author$project$Main$subScope(
-										A2($author$project$Main$genContractView, 0, model.W))
+										A2(
+											$author$project$Main$genContractView,
+											0,
+											$author$project$Marlowe$Semantics$annotateContract(model.W)))
 									])))
 						])))
 			]),
