@@ -6,8 +6,6 @@ import Unique as U
 
 
 -- Marlowe Types --
--- type alias Token =
---    { currencySymbol : String, tokenName : String }
 
 
 type alias CurrencySymbol =
@@ -67,7 +65,7 @@ type Value a
     | SubValue (Value a) (Value a)
     | MulValue (Value a) (Value a)
     | Scale Rational (Value a)
-    | ChoiceValue ChoiceId (Value a)
+    | ChoiceValue ChoiceId (Value a) -- (Value a) not present in Haskell code
     | SlotIntervalStart
     | SlotIntervalEnd
     | UseValue ValueId

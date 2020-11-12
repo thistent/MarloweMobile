@@ -1,6 +1,6 @@
 module Highlight exposing (..)
 
-import Element exposing (Color, rgb)
+import Element exposing (Color, fromRgb, rgb, toRgb)
 
 
 keyboardBorder =
@@ -161,3 +161,16 @@ choiceId =
 rational : Color
 rational =
     rgb 0.6 0.8 0.2
+
+
+
+-- Color Functions --
+
+
+keyBg : Float -> Color -> Color
+keyBg alpha color =
+    let
+        addAlpha c =
+            { c | alpha = alpha }
+    in
+    color |> toRgb |> addAlpha |> fromRgb

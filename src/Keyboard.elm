@@ -24,15 +24,6 @@ corners =
     }
 
 
-keyBg : Float -> Color -> Color
-keyBg alpha color =
-    let
-        addAlpha c =
-            { c | alpha = alpha }
-    in
-    color |> toRgb |> addAlpha |> fromRgb
-
-
 margin =
     20
 
@@ -41,16 +32,20 @@ borderWidth =
     2
 
 
-kb : Float -> Sem.Contract -> Element msg
-kb screenHeight contract =
+
+--kb : Float -> Sem.Contract -> Element msg
+
+
+kb : Float -> Element msg
+kb screenHeight =
     row
         [ alignBottom
         , width fill
-        , height <| px <| round <| screenHeight * 0.45
+        , height <| px <| round <| screenHeight * 0.5
         , Border.width borderWidth
         , Border.roundEach { corners | topLeft = margin, topRight = margin }
         , Border.color <| Hi.keyboardBorder
-        , Bg.color <| keyBg 0.9 Hi.bgBlue
+        , Bg.color <| Hi.keyBg 0.9 Hi.bgBlue
         , Font.size 20
         , padding margin
         , spacing margin
@@ -94,16 +89,18 @@ kb screenHeight contract =
                 , spacing margin
                 ]
                 [ key (Paste <| ContractExpr Sem.Refund) Hi.white "Copy"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste"
+                , key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste\n(Type)"
                 ]
-            , el
-                [ width fill
-                , height <| px <| round <| screenHeight * 0.45 * 2 / 3
-                , clip
-                , scrollbars
-                ]
-              <|
-                genMiniContractView contract
+
+            {- , el
+                 [ width fill
+                 , height <| px <| round <| screenHeight * 0.45 * 2 / 3
+                 , clip
+                 , scrollbars
+                 ]
+               <|
+                 genMiniContractView contract
+            -}
             ]
         ]
 
@@ -173,7 +170,7 @@ key keyType color label =
     el
         [ Font.center
         , Font.color color
-        , Bg.color <| keyBg 0.2 color
+        , Bg.color <| Hi.keyBg 0.2 color
         , Border.width borderWidth
         , Border.rounded margin
         , width fill

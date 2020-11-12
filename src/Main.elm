@@ -48,6 +48,7 @@ type alias Model =
     , blink : Blink
     , sampleContract : Sem.Contract
     , keyboardState : Bool
+    , menuVisible : Bool
     , viewport : Dom.Viewport
     }
 
@@ -58,6 +59,7 @@ type Msg
     | TimeDelta Float
     | SwitchContract SampleContract
     | ToggleKeyboard
+    | ToggleMenu
     | UpdateViewport Dom.Viewport
 
 
@@ -96,7 +98,7 @@ dummyViewport =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init () url key =
-    ( Model key url 0.0 Regular Sem.escrow False dummyViewport
+    ( Model key url 0.0 Regular Sem.escrow False False dummyViewport
     , Cmd.batch
         [ Task.perform UpdateViewport Dom.getViewport
         ]
@@ -188,6 +190,11 @@ update msg model =
             , Cmd.none
             )
 
+        ToggleMenu ->
+            ( { model | menuVisible = not model.menuVisible }
+            , Cmd.none
+            )
+
         UpdateViewport vp ->
             ( { model | viewport = vp }, Cmd.none )
 
@@ -201,8 +208,8 @@ view model =
     { title = "Marlowe Mobile"
     , body =
         [ Element.layout
-            [ width fill
-            , height fill
+            [ width <| px <| round model.viewport.viewport.width
+            , height <| px <| round model.viewport.viewport.height
             , Bg.color Hi.bgBlue
             , Font.color Hi.accentPink
             , Font.size 30
@@ -210,49 +217,67 @@ view model =
                 [ Font.typeface "Helvetica"
                 , Font.sansSerif
                 ]
-            , clip
-            , scrollbarY
             , inFront <|
                 if model.keyboardState then
-                    Kb.kb model.viewport.viewport.height model.sampleContract
+                    Kb.kb model.viewport.viewport.height
+                    --model.sampleContract
 
                 else
                     none
             ]
           <|
             column
-                [ width fill
-                , height fill
+                [ width <| px <| round model.viewport.viewport.width
+                , height <| px <| round model.viewport.viewport.height
+                , clip
+                , scrollbarY
                 ]
                 [ row
                     [ Font.size 60
                     , Font.letterSpacing 1.5
                     , Font.color Hi.white
+                    , Border.widthEach { edges | bottom = borderWidth }
+                    , Border.dotted
+                    , Border.color Hi.accentPink
                     , width fill
-                    , paddingEach
-                        { edges
-                            | top = 2 * margin
-                            , left = 2 * margin
-                        }
+                    , paddingXY (margin * 2) margin
                     ]
                     [ el [ Font.bold ] <|
                         text "Marlowe "
                     , el [] <|
                         text "Mobile"
-                    ]
-                , row
-                    [ Border.widthEach { edges | bottom = borderWidth }
-                    , Border.dotted
-                    , Font.size 20
-                    , paddingXY (2 * margin) margin
-                    , spacing <| 2 * margin
-                    , width fill
-                    ]
-                    [ button CouponBond "CouponBondGuaranteed"
-                    , button Escrow "Escrow"
-                    , button Swap "Swap"
-                    , button ZeroCoupon "ZeroCouponBond"
-                    , button NilContract "Nil"
+                    , el
+                        [ alignRight
+                        , padding margin
+                        , below <|
+                            if model.menuVisible then
+                                column
+                                    [ height shrink
+                                    , width shrink
+
+                                    --, Bg.color <| rgb 1 0 0
+                                    , Font.size 20
+                                    , Font.color Hi.accentPink
+                                    , Border.width borderWidth
+                                    , Bg.color <| Hi.keyBg 0.75 Hi.bgBlue
+                                    , Border.dotted
+                                    , alignRight
+                                    , padding <| margin * 2
+                                    , spacing <| margin * 4
+                                    ]
+                                    [ sampleButton CouponBond "CouponBondGuaranteed"
+                                    , sampleButton Escrow "Escrow"
+                                    , sampleButton Swap "Swap"
+                                    , sampleButton ZeroCoupon "ZeroCouponBond"
+                                    , sampleButton NilContract "Nil"
+                                    ]
+
+                            else
+                                none
+                        , ElEvent.onClick ToggleMenu
+                        ]
+                      <|
+                        text "≣"
                     ]
                 , el
                     [ width fill
@@ -260,8 +285,6 @@ view model =
                     , padding <| 2 * margin
                     , Bg.color Hi.black
                     , ElEvent.onClick ToggleKeyboard
-
-                    --, Font.size 30
                     ]
                   <|
                     ([ topHeader "Contract such that"
@@ -292,8 +315,8 @@ borderWidth =
     2
 
 
-button : SampleContract -> String -> Element Msg
-button c s =
+sampleButton : SampleContract -> String -> Element Msg
+sampleButton c s =
     Input.button
         []
         { onPress = Just (SwitchContract c)
