@@ -208,98 +208,105 @@ view model =
     { title = "Marlowe Mobile"
     , body =
         [ Element.layout
-            [ width <| px <| round model.viewport.viewport.width
-            , height <| px <| round model.viewport.viewport.height
-            , Bg.color Hi.bgBlue
-            , Font.color Hi.accentPink
+            [ width fill
+            , height fill
+
+            -- <| px <| round model.viewport.viewport.width
+            -- <| px <| round model.viewport.viewport.height
             , Font.size 30
+            , Font.color Hi.accentPink
+            , Bg.color Hi.black
             , Font.family
                 [ Font.typeface "Helvetica"
                 , Font.sansSerif
                 ]
+            , inFront <| topRow model
             , inFront <|
                 if model.keyboardState then
                     Kb.kb model.viewport.viewport.height
-                    --model.sampleContract
 
                 else
                     none
             ]
           <|
-            column
-                [ width <| px <| round model.viewport.viewport.width
+            el
+                [ width fill
                 , height <| px <| round model.viewport.viewport.height
-                , clip
+                , Bg.color Hi.black
+                , paddingEach
+                    { edges
+                        | left = 2 * margin
+                        , right = 2 * margin
+                        , top = 125
+                        , bottom = round <| model.viewport.viewport.height / 2
+                    }
+                , ElEvent.onClick ToggleKeyboard
+                , clipY
                 , scrollbarY
                 ]
-                [ row
-                    [ Font.size 60
-                    , Font.letterSpacing 1.5
-                    , Font.color Hi.white
-                    , Border.widthEach { edges | bottom = borderWidth }
-                    , Border.dotted
-                    , Border.color Hi.accentPink
-                    , width fill
-                    , paddingXY (margin * 2) margin
-                    ]
-                    [ el [ Font.bold ] <|
-                        text "Marlowe "
-                    , el [] <|
-                        text "Mobile"
-                    , el
-                        [ alignRight
-                        , padding margin
-                        , below <|
-                            if model.menuVisible then
-                                column
-                                    [ height shrink
-                                    , width shrink
-
-                                    --, Bg.color <| rgb 1 0 0
-                                    , Font.size 20
-                                    , Font.color Hi.accentPink
-                                    , Border.width borderWidth
-                                    , Bg.color <| Hi.keyBg 0.75 Hi.bgBlue
-                                    , Border.dotted
-                                    , alignRight
-                                    , padding <| margin * 2
-                                    , spacing <| margin * 4
-                                    ]
-                                    [ sampleButton CouponBond "CouponBondGuaranteed"
-                                    , sampleButton Escrow "Escrow"
-                                    , sampleButton Swap "Swap"
-                                    , sampleButton ZeroCoupon "ZeroCouponBond"
-                                    , sampleButton NilContract "Nil"
-                                    ]
-
-                            else
-                                none
-                        , ElEvent.onClick ToggleMenu
-                        ]
-                      <|
-                        text "≣"
-                    ]
-                , el
-                    [ width fill
-                    , height fill
-                    , padding <| 2 * margin
-                    , Bg.color Hi.black
-                    , ElEvent.onClick ToggleKeyboard
-                    ]
-                  <|
-                    ([ topHeaderPlain "Contract such that"
-
-                     -- TODO: model.blink along with the unique id of the subtree where blink should
-                     -- start if something is selected should be passed to genContractView.
-                     , subScope <|
-                        genContractView Regular <|
-                            Sem.annotateContract model.sampleContract
-                     ]
-                        |> scopeBlock Regular Hi.contractBase
-                    )
-                ]
+            <|
+                ([ topHeaderPlain "Contract such that"
+                 , subScope <|
+                    genContractView Regular <|
+                        Sem.annotateContract model.sampleContract
+                 ]
+                    |> scopeBlock Regular Hi.contractBase
+                )
         ]
     }
+
+
+topRow : Model -> Element Msg
+topRow model =
+    row
+        [ Font.size 60
+        , Font.letterSpacing 1.5
+        , Font.color Hi.white
+        , Bg.color Hi.bgBlue
+        , Border.widthEach { edges | bottom = borderWidth }
+        , Border.dotted
+        , Border.color Hi.accentPink
+        , width fill
+        , height shrink
+        , paddingXY (margin * 2) margin
+        ]
+        [ el [ Font.bold ] <|
+            text "Marlowe "
+        , el [] <|
+            text "Mobile"
+        , el
+            [ alignRight
+            , padding margin
+            , below <|
+                if model.menuVisible then
+                    column
+                        [ height shrink
+                        , width shrink
+
+                        --, Bg.color <| rgb 1 0 0
+                        , Font.size 20
+                        , Font.color Hi.accentPink
+                        , Border.width borderWidth
+                        , Bg.color <| Hi.keyBg 0.75 Hi.bgBlue
+                        , Border.dotted
+                        , alignRight
+                        , padding <| margin * 2
+                        , spacing <| margin * 4
+                        ]
+                        [ sampleButton CouponBond "CouponBondGuaranteed"
+                        , sampleButton Escrow "Escrow"
+                        , sampleButton Swap "Swap"
+                        , sampleButton ZeroCoupon "ZeroCouponBond"
+                        , sampleButton NilContract "Nil"
+                        ]
+
+                else
+                    none
+            , ElEvent.onClick ToggleMenu
+            ]
+          <|
+            text "≣"
+        ]
 
 
 margin : Int

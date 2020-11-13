@@ -417,19 +417,27 @@ annotateString s =
 
 
 
-{-
-   annotateAction : Action -> AnnoAction
-   annotateAction act =
-       case act of
-           Deposit id str val ->
-               AnnoDeposit (annotateAccountId id) String (AnnoValue AnnoObservation) Anno
+-- For holding different types of values in clipboard for pasting --
 
-           Choice (ChoiceId name owner) bounds ->
-               AnnoChoice AnnoChoiceId (List AnnoBound) Anno
 
-           Notify obs ->
-               AnnoNotify AnnoObservation Anno
--}
+type Expr
+    = StringExpr String
+    | NumExpr Int
+    | TokenExpr Token
+    | ValueIdExpr ValueId
+    | PayeeExpr Payee
+    | BoundExpr Bound
+    | CaseExpr (Case Action Contract)
+    | RationalExpr Rational
+    | AccountIdExpr AccountId
+    | ChoiceIdExpr ChoiceId
+    | ContractExpr Contract
+    | ValueExpr (Value Observation)
+    | ObservationExpr Observation
+    | ActionExpr Action
+
+
+
 -- Unique Tree Testing --
 
 

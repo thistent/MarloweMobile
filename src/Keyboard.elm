@@ -45,52 +45,50 @@ kb screenHeight =
         , Border.width borderWidth
         , Border.roundEach { corners | topLeft = margin, topRight = margin }
         , Border.color <| Hi.keyboardBorder
-        , Bg.color <| Hi.keyBg 0.9 Hi.bgBlue
+        , Bg.color Hi.bgBlue
         , Font.size 20
         , padding margin
         , spacing margin
         ]
         [ column [ width fill, height fill, spacing margin ]
-            [ key (Paste <| ContractExpr Sem.Refund) Hi.refund "Refund"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.string "\" \""
-            , key (Paste <| ContractExpr Sem.Refund) Hi.numColor "42"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.value "ValueId"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.value "Choose"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.deposit "Deposit"
+            [ key (Paste <| Sem.ContractExpr Sem.Refund) Hi.refund "Refund"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.string "\" \""
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.numColor "42"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.value "ValueId"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.value "Choose"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.deposit "Deposit"
             ]
         , column [ width fill, height fill, spacing margin ]
-            [ key (Paste <| ContractExpr Sem.Refund) Hi.pay "Pay"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.accountId "Account"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.notColor "Not"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.trueObs "True"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.falseObs "False"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.choice "Choice"
+            [ key (Paste <| Sem.ContractExpr Sem.Refund) Hi.pay "Pay"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.accountId "Account"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.notColor "Not"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.trueObs "True"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.falseObs "False"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.choice "Choice"
             ]
         , column [ width fill, height fill, spacing margin ]
-            [ key (Paste <| ContractExpr Sem.Refund) Hi.letColor "Let"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.ifColor "If"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "And"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.valueGT ">"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.valueLT "<"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.notify "Notify"
+            [ key (Paste <| Sem.ContractExpr Sem.Refund) Hi.letColor "Let"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.ifColor "If"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.andOr "And"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.valueGT ">"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.valueLT "<"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.notify "Notify"
             ]
         , column [ width fill, height fill, spacing margin ]
-            [ key (Paste <| ContractExpr Sem.Refund) (rgb 1 0.2 0) "When"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.caseColor "Case"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.andOr "Or"
-            , key (Paste <| ContractExpr Sem.Refund) Hi.valueGE ">="
-            , key (Paste <| ContractExpr Sem.Refund) Hi.valueLE "<="
-            , key (Paste <| ContractExpr Sem.Refund) Hi.valueEQ "="
+            [ key (Paste <| Sem.ContractExpr Sem.Refund) (rgb 1 0.2 0) "When"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.caseColor "Case"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.andOr "Or"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.valueGE ">="
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.valueLE "<="
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.valueEQ "="
             ]
         , column [ width fill, height fill, spacing margin ]
-            [ column
-                [ width fill
-                , height <| px <| round <| screenHeight * 0.45 / 3
-                , spacing margin
-                ]
-                [ key (Paste <| ContractExpr Sem.Refund) Hi.white "Copy"
-                , key (Paste <| ContractExpr Sem.Refund) Hi.white "Paste\n(Type)"
-                ]
+            [ key (Paste <| Sem.ContractExpr Sem.Refund) Hi.white "Copy"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.white "Paste\n(Type)"
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
 
             {- , el
                  [ width fill
@@ -143,26 +141,9 @@ kb screenHeight =
 -- Keyboard Button --
 
 
-type Expr
-    = StringExpr String
-    | NumExpr Int
-    | TokenExpr Sem.Token
-    | ValueIdExpr Sem.ValueId
-    | PayeeExpr Sem.Payee
-    | BoundExpr Sem.Bound
-    | CaseExpr (Sem.Case Sem.Action Sem.Contract)
-    | RationalExpr Sem.Rational
-    | AccountIdExpr Sem.AccountId
-    | ChoiceIdExpr Sem.ChoiceId
-    | ContractExpr Sem.Contract
-    | ValueExpr (Sem.Value Sem.Observation)
-    | ObservationExpr Sem.Observation
-    | ActionExpr Sem.Action
-
-
 type KeyMsg
-    = Copy Expr
-    | Paste Expr
+    = Copy Sem.Expr
+    | Paste Sem.Expr
 
 
 key : KeyMsg -> Color -> String -> Element msg
