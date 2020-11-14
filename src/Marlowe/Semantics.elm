@@ -1,7 +1,33 @@
 module Marlowe.Semantics exposing (..)
 
 import BigInt exposing (BigInt)
+import Browser
+import Browser.Dom as Dom
 import Unique as U
+import Url
+
+
+
+-- Messages --
+
+
+type Msg
+    = NewUrl Url.Url
+    | Link Browser.UrlRequest
+    | TimeDelta Float
+    | SwitchContract SampleContract
+    | ToggleKeyboard
+    | ToggleMenu
+    | UpdateViewport Dom.Viewport
+    | Select (Maybe Anno)
+
+
+type SampleContract
+    = CouponBond
+    | Escrow
+    | Swap
+    | ZeroCoupon
+    | NilContract
 
 
 

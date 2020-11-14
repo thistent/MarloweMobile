@@ -167,10 +167,10 @@ rational =
 -- Color Functions --
 
 
-keyBg : Float -> Color -> Color
-keyBg alpha color =
+addAlpha : Float -> Color -> Color
+addAlpha alpha color =
     let
-        addAlpha c =
+        addA c =
             { c | alpha = alpha }
     in
-    color |> toRgb |> addAlpha |> fromRgb
+    color |> toRgb |> addA |> fromRgb

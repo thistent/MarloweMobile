@@ -4,6 +4,7 @@ import Element exposing (..)
 import Element.Background as Bg
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import Highlight as Hi
 import Marlowe.Semantics as Sem
 
@@ -36,7 +37,7 @@ borderWidth =
 --kb : Float -> Sem.Contract -> Element msg
 
 
-kb : Float -> Element msg
+kb : Float -> Element Sem.Msg
 kb screenHeight =
     row
         [ alignBottom
@@ -83,24 +84,38 @@ kb screenHeight =
             , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.valueEQ "="
             ]
         , column [ width fill, height fill, spacing margin ]
-            [ key (Paste <| Sem.ContractExpr Sem.Refund) Hi.white "Copy"
+            [ closeKeyboard
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
+            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.white "Copy"
             , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.white "Paste\n(Type)"
-            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
-            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
-            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
-            , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
-
-            {- , el
-                 [ width fill
-                 , height <| px <| round <| screenHeight * 0.45 * 2 / 3
-                 , clip
-                 , scrollbars
-                 ]
-               <|
-                 genMiniContractView contract
-            -}
             ]
         ]
+
+
+closeKeyboard : Element Sem.Msg
+closeKeyboard =
+    Input.button
+        [ Font.center
+        , Font.color Hi.white
+        , Bg.color <| Hi.addAlpha 0.2 Hi.black
+        , Border.width borderWidth
+        , Border.rounded margin
+        , Border.color Hi.black
+        , width fill
+        , height fill
+        ]
+        { onPress = Just Sem.ToggleKeyboard
+        , label =
+            el
+                [ centerY
+                , centerX
+                , Font.size 40
+                ]
+            <|
+                text "✕"
+        }
 
 
 
@@ -151,7 +166,7 @@ key keyType color label =
     el
         [ Font.center
         , Font.color color
-        , Bg.color <| Hi.keyBg 0.2 color
+        , Bg.color <| Hi.addAlpha 0.2 color
         , Border.width borderWidth
         , Border.rounded margin
         , width fill
