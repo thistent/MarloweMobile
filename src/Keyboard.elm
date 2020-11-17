@@ -46,7 +46,7 @@ kb viewport =
         , Border.width borderWidth
         , Border.roundEach { corners | topLeft = margin, topRight = margin }
         , Border.color <| Hi.keyboardBorder
-        , Bg.color Hi.bgBlue
+        , Bg.color <| Hi.addAlpha 0.9 Hi.bgBlue
         , Font.size <| round <| viewport.width / 32
         , padding margin
         , spacing margin

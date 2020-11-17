@@ -225,7 +225,7 @@ view model =
                     { edges
                         | left = 2 * margin
                         , right = 2 * margin
-                        , top = 125
+                        , top = round <| model.display.viewport.width / 5.5
                         , bottom = round <| model.display.viewport.height / 2
                     }
 
@@ -250,7 +250,7 @@ topRow model =
         [ Font.size <| round <| model.display.viewport.width / 12
         , Font.letterSpacing 1.5
         , Font.color Hi.white
-        , Bg.color Hi.bgBlue
+        , Bg.color <| Hi.addAlpha 0.9 Hi.bgBlue
         , Border.widthEach { edges | bottom = borderWidth }
         , Border.dotted
         , Border.color Hi.accentPink
@@ -273,7 +273,7 @@ topRow model =
                         , Font.size <| round <| model.display.viewport.width / 35
                         , Font.color Hi.accentPink
                         , Border.width borderWidth
-                        , Bg.color <| Hi.addAlpha 0.75 Hi.bgBlue
+                        , Bg.color <| Hi.addAlpha 0.9 Hi.bgBlue
                         , Border.dotted
                         , alignRight
                         , padding <| margin * 2
