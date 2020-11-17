@@ -283,19 +283,26 @@ annotateValue val =
                 U.unique
 
         ChoiceValue id v ->
-            AnnoAvailableMoney U.unique
+            AnnoChoiceValue
+                (annotateChoiceId id)
+                (annotateValue v)
+                U.unique
 
         SlotIntervalStart ->
-            AnnoAvailableMoney U.unique
+            AnnoSlotIntervalStart U.unique
 
         SlotIntervalEnd ->
-            AnnoAvailableMoney U.unique
+            AnnoSlotIntervalEnd U.unique
 
         UseValue id ->
-            AnnoAvailableMoney U.unique
+            AnnoUseValue (annotateNum id) U.unique
 
         Cond o a b ->
-            AnnoAvailableMoney U.unique
+            AnnoCond
+                (annotateObservation o)
+                (annotateValue a)
+                (annotateValue b)
+                U.unique
 
 
 annotateObservation : Observation -> AnnoObservation
