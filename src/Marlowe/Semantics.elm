@@ -384,7 +384,9 @@ annotateAction act =
                 U.unique
 
         Notify o ->
-            AnnoNotify (annotateObservation o) U.unique
+            AnnoNotify
+                (annotateObservation o)
+                U.unique
 
 
 annotateCase : Case Action Contract -> AnnoCase AnnoAction AnnoContract
@@ -428,7 +430,9 @@ annotatePayee p =
                 U.unique
 
         Party str ->
-            AnnoParty (annotateString str) U.unique
+            AnnoParty
+                (annotateString str)
+                U.unique
 
 
 annotateBound : Bound -> AnnoBound

@@ -37,17 +37,17 @@ borderWidth =
 --kb : Float -> Sem.Contract -> Element msg
 
 
-kb : Float -> Element Sem.Msg
-kb screenHeight =
+kb : { width : Float, height : Float, x : Float, y : Float } -> Element Sem.Msg
+kb viewport =
     row
         [ alignBottom
         , width fill
-        , height <| px <| round <| screenHeight * 0.5
+        , height <| px <| round <| viewport.height * 0.5
         , Border.width borderWidth
         , Border.roundEach { corners | topLeft = margin, topRight = margin }
         , Border.color <| Hi.keyboardBorder
         , Bg.color Hi.bgBlue
-        , Font.size 20
+        , Font.size <| round <| viewport.width / 32
         , padding margin
         , spacing margin
         ]
@@ -84,7 +84,7 @@ kb screenHeight =
             , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.valueEQ "="
             ]
         , column [ width fill, height fill, spacing margin ]
-            [ closeKeyboard
+            [ closeKeyboard <| round <| viewport.width / 15
             , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
             , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
             , key (Paste <| Sem.ContractExpr Sem.Refund) Hi.black ""
@@ -94,8 +94,8 @@ kb screenHeight =
         ]
 
 
-closeKeyboard : Element Sem.Msg
-closeKeyboard =
+closeKeyboard : Int -> Element Sem.Msg
+closeKeyboard xSize =
     Input.button
         [ Font.center
         , Font.color Hi.white
@@ -111,7 +111,7 @@ closeKeyboard =
             el
                 [ centerY
                 , centerX
-                , Font.size 40
+                , Font.size xSize
                 ]
             <|
                 text "✕"

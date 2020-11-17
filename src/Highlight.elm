@@ -80,7 +80,7 @@ white =
 
 bgBlue : Color
 bgBlue =
-    rgb 0.08 0.08 0.16
+    rgb 0.1 0.1 0.2
 
 
 accentPink : Color
