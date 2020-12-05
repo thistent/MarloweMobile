@@ -4,8 +4,6 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events as Events
 import Browser.Navigation as Nav
-import Color as C
-import Color.Manipulate as CM
 import Element exposing (..)
 import Element.Background as Bg
 import Element.Border as Border
@@ -45,7 +43,7 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , timeDelta : Float
-    , blink : Blink
+    , blink : Hi.Blink
     , sampleContract : Sem.Contract
     , keyboardState : Bool
     , menuVisible : Bool
@@ -54,10 +52,13 @@ type alias Model =
     }
 
 
-type Blink
-    = Regular
-    | Half
-    | Full
+
+-- Highlight Theme --
+
+
+theme : Hi.Theme
+theme =
+    Hi.lightTheme
 
 
 
@@ -81,7 +82,7 @@ dummyViewport =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init () url key =
-    ( Model key url 0.0 Regular Sem.escrow False False dummyViewport Nothing
+    ( Model key url 0.0 Hi.Empty Sem.escrow False False dummyViewport Nothing
     , Cmd.batch
         [ Task.perform UpdateViewport Dom.getViewport
         ]
@@ -119,16 +120,16 @@ update msg model =
                 ( { model
                     | blink =
                         if newDelta <= 200 then
-                            Regular
+                            Hi.Empty
 
                         else if newDelta <= 400 then
-                            Half
+                            Hi.HalfFull
 
                         else if newDelta <= 600 then
-                            Full
+                            Hi.Full
 
                         else
-                            Half
+                            Hi.HalfEmpty
                     , timeDelta = model.timeDelta + delta
                   }
                 , Cmd.none
@@ -164,7 +165,7 @@ update msg model =
                     )
 
                 NilContract ->
-                    ( { model | sampleContract = Sem.Refund }
+                    ( { model | sampleContract = Sem.Close }
                     , Cmd.none
                     )
 
@@ -202,8 +203,8 @@ view model =
             [ width fill
             , height fill
             , Font.size <| round <| model.display.viewport.width / 20
-            , Font.color Hi.accentPink
-            , Bg.color Hi.black
+            , Font.color theme.accent
+            , Bg.color theme.bg
             , Font.family
                 [ Font.typeface "Helvetica"
                 , Font.sansSerif
@@ -220,7 +221,7 @@ view model =
             el
                 [ width fill
                 , height fill --<| px <| round model.viewport.viewport.height
-                , Bg.color Hi.black
+                , Bg.color theme.bg
                 , paddingEach
                     { edges
                         | left = 2 * margin
@@ -233,12 +234,12 @@ view model =
                 , clipY
                 , scrollbarY
                 ]
-                ([ topHeader Regular Hi.contractBase "Contract such that" Nothing
+                ([ topHeader Hi.Empty theme.contract "Contract such that" Nothing
                  , subScope <|
-                    genContractView Regular <|
+                    genContractView Hi.Empty {- model.blink -} <|
                         Sem.annotateContract model.sampleContract
                  ]
-                    |> scopeBlock Regular Hi.contractBase
+                    |> scopeBlock Hi.Empty theme.contract
                 )
         ]
     }
@@ -249,11 +250,11 @@ topRow model =
     row
         [ Font.size <| round <| model.display.viewport.width / 12
         , Font.letterSpacing 1.5
-        , Font.color Hi.white
-        , Bg.color <| Hi.addAlpha 0.9 Hi.bgBlue
+        , Font.color theme.fg
+        , Bg.color <| Hi.addAlpha 0.9 theme.barBg
         , Border.widthEach { edges | bottom = borderWidth }
         , Border.dotted
-        , Border.color Hi.accentPink
+        , Border.color theme.accent
         , width fill
         , height shrink
         , paddingXY (margin * 2) margin
@@ -271,9 +272,9 @@ topRow model =
                         [ height shrink
                         , width shrink
                         , Font.size <| round <| model.display.viewport.width / 35
-                        , Font.color Hi.accentPink
+                        , Font.color theme.accent
                         , Border.width borderWidth
-                        , Bg.color <| Hi.addAlpha 0.9 Hi.bgBlue
+                        , Bg.color <| Hi.addAlpha 0.9 theme.barBg
                         , Border.dotted
                         , alignRight
                         , padding <| margin * 2
@@ -322,36 +323,11 @@ sampleButton c s =
         [ width fill
         , Border.width borderWidth
         , Border.rounded margin
-        , padding margin
+        , paddingXY (margin * 2) margin
         ]
         { onPress = Just (SwitchContract c)
         , label = text s
         }
-
-
-blinkColor : Blink -> Color -> Color
-blinkColor blink baseColor =
-    case blink of
-        Regular ->
-            baseColor
-
-        Half ->
-            baseColor
-                |> toRgb
-                >> C.fromRgba
-                |> CM.desaturate 0.5
-                >> CM.lighten 0.2
-                |> C.toRgba
-                >> fromRgb
-
-        Full ->
-            baseColor
-                |> toRgb
-                >> C.fromRgba
-                |> CM.grayscale
-                >> CM.lighten 0.4
-                |> C.toRgba
-                >> fromRgb
 
 
 edges =
@@ -374,70 +350,88 @@ corners =
 -- Marlow View Components --
 
 
-genContractView : Blink -> Sem.AnnoContract -> Element Msg
+genContractView : Hi.Blink -> Sem.AnnoContract -> Element Msg
 genContractView blink contract =
+    let
+        color =
+            theme.contract
+    in
     case contract of
-        Sem.AnnoRefund anno ->
-            singletonHeader blink Hi.refund "Refund remaining" <| Just anno
+        Sem.AnnoClose anno ->
+            singletonHeader blink color "Close Contract" <| Just anno
 
-        Sem.AnnoPay p1 p2 v a anno ->
-            [ topHeader blink Hi.pay "Pay from" <| Just anno
-            , subScope <| genAccountIdView blink p1
-            , midHeader blink Hi.pay "to" <| Just anno
+        Sem.AnnoPay p1 p2 tok v a anno ->
+            [ topHeader blink color "Pay from" <| Just anno
+            , subScope <| genPartyView blink p1
+            , midHeader blink color "to" <| Just anno
             , subScope <| genPayeeView blink p2
-            , midHeader blink Hi.pay "the amount of" <| Just anno
+            , midHeader blink color "the amount of" <| Just anno
             , subScope <| genValueView blink v
-            , midHeader blink Hi.pay "and continue with" <| Just anno
+            , midHeader blink color "of currency" <| Just anno
+            , subScope <| genTokenView blink tok
+            , midHeader blink color "and continue with" <| Just anno
             , subScope <| genContractView blink a
             ]
-                |> scopeBlock blink Hi.pay
+                |> scopeBlock blink color
 
         Sem.AnnoIf o a b anno ->
-            [ topHeader blink Hi.ifColor "If" <| Just anno
+            [ topHeader blink color "If" <| Just anno
             , subScope <| genObservationView blink o
-            , midHeader blink Hi.ifColor "then" <| Just anno
+            , midHeader blink color "then" <| Just anno
             , subScope <| genContractView blink a
-            , midHeader blink Hi.ifColor "else" <| Just anno
+            , midHeader blink color "else" <| Just anno
             , subScope <| genContractView blink b
             ]
-                |> scopeBlock blink Hi.ifColor
+                |> scopeBlock blink color
 
         Sem.AnnoWhen cases t y anno ->
-            [ topHeader blink Hi.contractColor "When" <| Just anno
+            [ topHeader blink color "When" <| Just anno
             , column
                 [ paddingEach { edges | top = 15, left = 15, bottom = 15 }
+                , spacing 15
                 ]
-                (cases |> List.map (genCaseView blink))
-            , subScope <| singletonHeader blink Hi.caseColor "..." <| Just anno
-            , midHeader blink Hi.contractColor "after slot" <| Just anno
-            , subScope <| genNumberView blink t
-            , midHeader blink Hi.contractColor "continue as" <| Just anno
+                (cases
+                    |> List.map (genCaseView blink)
+                    |> (\x ->
+                            (++) x
+                                [ singletonHeader blink theme.action "..." <| Just anno ]
+                       )
+                )
+
+            --, subScope <| singletonHeader blink theme.action "..." <| Just anno
+            , midHeader blink color "after slot" <| Just anno
+            , subScope <| genNumberView blink color t
+            , midHeader blink color "continue as" <| Just anno
             , subScope <| genContractView blink y
             ]
-                |> scopeBlock blink Hi.contractColor
+                |> scopeBlock blink color
 
         Sem.AnnoLet id val a anno ->
-            [ topHeader blink Hi.letColor "Let the number" <| Just anno
-            , subScope <| genNumberView blink id
-            , midHeader blink Hi.letColor "identify the value" <| Just anno
+            [ topHeader blink color "Let the number" <| Just anno
+            , subScope <| genNumberView blink color id
+            , midHeader blink color "identify the value" <| Just anno
             , subScope <| genValueView blink val
-            , midHeader blink Hi.letColor "in" <| Just anno
+            , midHeader blink color "in" <| Just anno
             , subScope <| genContractView blink a
             ]
-                |> scopeBlock blink Hi.letColor
+                |> scopeBlock blink color
 
 
-genCaseView : Blink -> Sem.AnnoCase Sem.AnnoAction Sem.AnnoContract -> Element Msg
+genCaseView : Hi.Blink -> Sem.AnnoCase Sem.AnnoAction Sem.AnnoContract -> Element Msg
 genCaseView blink (Sem.AnnoCase a c anno) =
-    [ topHeader blink Hi.caseColor "Case of action" <| Just anno
-    , subScope <| genActionView blink a
-    , midHeader blink Hi.caseColor "do contract" <| Just anno
+    let
+        color =
+            theme.action
+    in
+    [ --topHeader blink color "Action of" <| Just anno ,
+      subScope <| genActionView blink a
+    , midHeader blink color "continue as" <| Just anno
     , subScope <| genContractView blink c
     ]
-        |> scopeBlock blink Hi.caseColor
+        |> scopeBlock blink color
 
 
-genPayeeView : Blink -> Sem.AnnoPayee -> Element Msg
+genPayeeView : Hi.Blink -> Sem.AnnoPayee -> Element Msg
 genPayeeView blink payee =
     case payee of
         Sem.AnnoAccount id anno ->
@@ -447,255 +441,334 @@ genPayeeView blink payee =
             genPartyView blink name
 
 
-genAccountIdView : Blink -> Sem.AnnoAccountId -> Element Msg
+genAccountIdView : Hi.Blink -> Sem.AnnoAccountId -> Element Msg
 genAccountIdView blink (Sem.AnnoAccountId num owner anno) =
-    [ topHeader blink Hi.accountId "Account" <| Just anno
-    , subScope <| genNumberView blink num
-    , midHeader blink Hi.accountId "with owner" <| Just anno
-    , subScope <| genPartyView blink owner
+    let
+        color =
+            theme.payee
+    in
+    [ topHeader blink color "Account" <| Just anno
+    , subScope <| genNumberView blink color num
+    , midHeader blink color "with owner" <| Just anno
+    , subScope <| genStringView blink color owner
     ]
-        |> scopeBlock blink Hi.accountId
+        |> scopeBlock blink color
 
 
-genPartyView : Blink -> Sem.AnnoString -> Element Msg
-genPartyView blink name =
-    genStringView blink name
+genPartyView : Hi.Blink -> Sem.AnnoParty -> Element Msg
+genPartyView blink party =
+    let
+        color =
+            theme.party
+    in
+    case party of
+        Sem.AnnoPK str anno ->
+            [ topHeader blink color "Public Key" <| Just anno
+            , subScope <| genStringView blink color str
+            ]
+                |> scopeBlock blink color
+
+        Sem.AnnoRole str anno ->
+            [ topHeader blink color "Role" <| Just anno
+            , subScope <| genStringView blink color str
+            ]
+                |> scopeBlock blink color
 
 
-genStringView : Blink -> Sem.AnnoString -> Element Msg
-genStringView blink (Sem.AnnoString str anno) =
-    singletonHeader blink Hi.string ("\"" ++ str ++ "\"") <| Just anno
+genStringView : Hi.Blink -> Color -> Sem.AnnoString -> Element Msg
+genStringView blink color (Sem.AnnoString str anno) =
+    let
+        newColor =
+            Hi.lighten color
+    in
+    singletonHeader blink
+        newColor
+        ("\"" ++ str ++ "\"")
+    <|
+        Just anno
 
 
-genNumberView : Blink -> Sem.AnnoNum -> Element Msg
-genNumberView blink (Sem.AnnoNum num anno) =
-    singletonHeader blink Hi.numColor (String.fromInt num) <| Just anno
+genNumberView : Hi.Blink -> Color -> Sem.AnnoNum -> Element Msg
+genNumberView blink color (Sem.AnnoNum num anno) =
+    let
+        newColor =
+            Hi.lighten color
+    in
+    singletonHeader blink newColor (String.fromInt num) <| Just anno
 
 
-genValueView : Blink -> Sem.AnnoValue Sem.AnnoObservation -> Element Msg
+genTokenView : Hi.Blink -> Sem.AnnoToken -> Element Msg
+genTokenView blink (Sem.AnnoToken sym name anno) =
+    singletonHeader blink
+        theme.token
+        (if sym == "" && name == "" then
+            "ada"
+
+         else
+            "Token with currency "
+                ++ sym
+                ++ "and name "
+                ++ name
+        )
+    <|
+        Just anno
+
+
+genValueView : Hi.Blink -> Sem.AnnoValue Sem.AnnoObservation -> Element Msg
 genValueView blink val =
+    let
+        color =
+            theme.value
+    in
     case val of
         Sem.AnnoAvailableMoney anno ->
-            singletonHeader blink Hi.value "Available Money" <| Just anno
+            singletonHeader blink color "Available Money" <| Just anno
 
         Sem.AnnoConstant num anno ->
-            genNumberView blink num
+            genNumberView blink color num
 
         Sem.AnnoNegValue v anno ->
-            [ topHeader blink Hi.value "negative" <| Just anno
+            [ topHeader blink color "negative" <| Just anno
             , subScope <| genValueView blink v
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
         Sem.AnnoAddValue v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.value "plus" <| Just anno
+            , midHeader blink color "plus" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
         Sem.AnnoSubValue v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.value "minus" <| Just anno
+            , midHeader blink color "minus" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
         Sem.AnnoMulValue v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.value "times" <| Just anno
+            , midHeader blink color "times" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
         Sem.AnnoScale rat v anno ->
-            [ topHeader blink Hi.value "Scale by" <| Just anno
+            [ topHeader blink color "Scale by" <| Just anno
             , subScope <| genRationalView blink rat
-            , midHeader blink Hi.value "the value" <| Just anno
+            , midHeader blink color "the value" <| Just anno
             , subScope <| genValueView blink v
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
-        Sem.AnnoChoiceValue id v anno ->
-            [ topHeader blink Hi.value "A choice of" <| Just anno
+        Sem.AnnoChoiceValue id anno ->
+            [ topHeader blink color "A choice of" <| Just anno
             , subScope <| genChoiceIdView blink id
-            , midHeader blink Hi.value "with a default value of" <| Just anno
-            , subScope <| genValueView blink v
-
-            --, endHeader "if no value is given" <| Just anno
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
         Sem.AnnoSlotIntervalStart anno ->
-            singletonHeader blink Hi.value "Start of slot interval" <| Just anno
+            singletonHeader blink color "Start of slot interval" <| Just anno
 
         Sem.AnnoSlotIntervalEnd anno ->
-            singletonHeader blink Hi.value "End of slot interval" <| Just anno
+            singletonHeader blink color "End of slot interval" <| Just anno
 
         Sem.AnnoUseValue id anno ->
-            [ topHeader blink Hi.value "Use value with identity" <| Just anno
-            , subScope <| genNumberView blink id
+            [ topHeader blink color "Use value with identity" <| Just anno
+            , subScope <| genNumberView blink color id
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
         Sem.AnnoCond o a b anno ->
-            [ topHeader blink Hi.value "If it's observed that" <| Just anno
+            [ topHeader blink color "If it's observed that" <| Just anno
             , subScope <| genObservationView blink o
-            , midHeader blink Hi.value "then use the value" <| Just anno
+            , midHeader blink color "then use the value" <| Just anno
             , subScope <| genValueView blink a
-            , midHeader blink Hi.value "otherwise use" <| Just anno
+            , midHeader blink color "otherwise use" <| Just anno
             , subScope <| genValueView blink b
             ]
-                |> scopeBlock blink Hi.value
+                |> scopeBlock blink color
 
 
-genObservationView : Blink -> Sem.AnnoObservation -> Element Msg
+genObservationView : Hi.Blink -> Sem.AnnoObservation -> Element Msg
 genObservationView blink obs =
+    let
+        color =
+            theme.observation
+    in
     case obs of
         Sem.AnnoAndObs o1 o2 anno ->
             [ subScope <| genObservationView blink o1
-            , midHeader blink Hi.andOr "and" <| Just anno
+            , midHeader blink color "and" <| Just anno
             , subScope <| genObservationView blink o2
             ]
-                |> scopeBlock blink Hi.andOr
+                |> scopeBlock blink color
 
         Sem.AnnoOrObs o1 o2 anno ->
             [ subScope <| genObservationView blink o1
-            , midHeader blink Hi.andOr "or" <| Just anno
+            , midHeader blink color "or" <| Just anno
             , subScope <| genObservationView blink o2
             ]
-                |> scopeBlock blink Hi.andOr
+                |> scopeBlock blink color
 
         Sem.AnnoNotObs o anno ->
-            [ topHeader blink Hi.notColor "not" <| Just anno
+            [ topHeader blink color "not" <| Just anno
             , subScope <| genObservationView blink o
             ]
-                |> scopeBlock blink Hi.notColor
+                |> scopeBlock blink color
 
         Sem.AnnoChooseSomething id anno ->
-            [ topHeader blink Hi.chooseSomething "This choice is made" <| Just anno
+            [ topHeader blink color "This choice is made" <| Just anno
             , subScope <| genChoiceIdView blink id
             ]
-                |> scopeBlock blink Hi.chooseSomething
+                |> scopeBlock blink color
 
         Sem.AnnoValueGE v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.valueGE "is greater than or equal to" <| Just anno
+            , midHeader blink color "is greater than or equal to" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.valueGE
+                |> scopeBlock blink color
 
         Sem.AnnoValueGT v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.valueGT "is greater than" <| Just anno
+            , midHeader blink color "is greater than" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.valueGT
+                |> scopeBlock blink color
 
         Sem.AnnoValueLT v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.valueLT "is less than" <| Just anno
+            , midHeader blink color "is less than" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.valueLT
+                |> scopeBlock blink color
 
         Sem.AnnoValueLE v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.valueLE "is less than or equal to" <| Just anno
+            , midHeader blink color "is less than or equal to" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.valueLE
+                |> scopeBlock blink color
 
         Sem.AnnoValueEQ v1 v2 anno ->
             [ subScope <| genValueView blink v1
-            , midHeader blink Hi.valueEQ "is equal to" <| Just anno
+            , midHeader blink color "is equal to" <| Just anno
             , subScope <| genValueView blink v2
             ]
-                |> scopeBlock blink Hi.valueEQ
+                |> scopeBlock blink color
 
         Sem.AnnoTrueObs anno ->
-            singletonHeader blink Hi.trueObs "True" <| Just anno
+            singletonHeader blink color "True" <| Just anno
 
         Sem.AnnoFalseObs anno ->
-            singletonHeader blink Hi.falseObs "False" <| Just anno
+            singletonHeader blink color "False" <| Just anno
 
 
-genActionView : Blink -> Sem.AnnoAction -> Element Msg
+genActionView : Hi.Blink -> Sem.AnnoAction -> Element Msg
 genActionView blink action =
+    let
+        color =
+            theme.action
+    in
     case action of
-        Sem.AnnoDeposit id str val anno ->
-            [ topHeader blink Hi.deposit "Deposit to" <| Just anno
-            , subScope <| genAccountIdView blink id
-            , midHeader blink Hi.deposit "from wallet of" <| Just anno
-            , subScope <| genStringView blink str
-            , midHeader blink Hi.deposit "the amount of" <| Just anno
+        Sem.AnnoDeposit getter giver tok val anno ->
+            [ topHeader blink color "Deposit by" <| Just anno
+            , subScope <| genPartyView blink giver
+            , midHeader blink color "the amount of" <| Just anno
             , subScope <| genValueView blink val
+            , midHeader blink color "currency" <| Just anno
+            , subScope <| genTokenView blink tok
+            , midHeader blink color "into account of" <| Just anno
+            , subScope <| genPartyView blink getter
             ]
-                |> scopeBlock blink Hi.deposit
+                |> scopeBlock blink color
 
         Sem.AnnoChoice choice bounds anno ->
-            [ topHeader blink Hi.choice "A choice made" <| Just anno
+            [ topHeader blink color "A choice made" <| Just anno
             , subScope <| genChoiceIdView blink choice
-            , midHeader blink Hi.choice "with bounds" <| Just anno
+            , midHeader blink color "with bounds" <| Just anno
             , column
                 [ paddingEach { edges | top = 15, left = 15, bottom = 15 }
+                , spacing 15
                 ]
-                (bounds |> List.map (genBoundsView blink))
-            , subScope <| singletonHeader blink Hi.bounds "..." <| Just anno
+                --(bounds |> List.map (genBoundsView blink))
+                (bounds
+                    |> List.map (genBoundsView blink)
+                    |> (\x ->
+                            (++) x
+                                [ singletonHeader blink theme.bound "..." <| Just anno ]
+                       )
+                )
+
+            --, subScope <| singletonHeader blink theme.bound "..." <| Just anno
             ]
-                |> scopeBlock blink Hi.choice
+                |> scopeBlock blink color
 
         Sem.AnnoNotify obs anno ->
-            [ topHeader blink Hi.notify "Notify when" <| Just anno
+            [ topHeader blink color "Notify when" <| Just anno
             , subScope <| genObservationView blink obs
             ]
-                |> scopeBlock blink Hi.notify
+                |> scopeBlock blink color
 
 
-genBoundsView : Blink -> Sem.AnnoBound -> Element Msg
+genBoundsView : Hi.Blink -> Sem.AnnoBound -> Element Msg
 genBoundsView blink (Sem.AnnoBound a b anno) =
-    [ topHeader blink Hi.bounds "Between" <| Just anno
-    , subScope <| genNumberView blink a
-    , midHeader blink Hi.bounds "and" <| Just anno
-    , subScope <| genNumberView blink b
+    let
+        color =
+            theme.bound
+    in
+    [ topHeader blink color "Between" <| Just anno
+    , subScope <| genNumberView blink color a
+    , midHeader blink color "and" <| Just anno
+    , subScope <| genNumberView blink color b
     ]
-        |> scopeBlock blink Hi.bounds
+        |> scopeBlock blink color
 
 
-genChoiceIdView : Blink -> Sem.AnnoChoiceId -> Element Msg
+genChoiceIdView : Hi.Blink -> Sem.AnnoChoiceId -> Element Msg
 genChoiceIdView blink (Sem.AnnoChoiceId choice owner anno) =
-    [ topHeader blink Hi.choiceId "The value identified by" <| Just anno
-    , subScope <| genStringView blink choice
-    , midHeader blink Hi.choiceId "and owned by" <| Just anno
-    , subScope <| genStringView blink owner
+    let
+        color =
+            theme.value
+    in
+    [ topHeader blink color "The value identified by" <| Just anno
+    , subScope <| genStringView blink color choice
+    , midHeader blink color "and owned by" <| Just anno
+    , subScope <| genPartyView blink owner
     ]
-        |> scopeBlock blink Hi.choiceId
+        |> scopeBlock blink color
 
 
-genRationalView : Blink -> Sem.AnnoRational -> Element Msg
+genRationalView : Hi.Blink -> Sem.AnnoRational -> Element Msg
 genRationalView blink (Sem.AnnoRational n d anno) =
-    [ subScope <| genNumberView blink n
-    , midHeader blink Hi.rational "over" <| Just anno
-    , subScope <| genNumberView blink d
+    let
+        color =
+            theme.value
+    in
+    [ subScope <| genNumberView blink color n
+    , midHeader blink color "over" <| Just anno
+    , subScope <| genNumberView blink color d
     ]
-        |> scopeBlock blink Hi.rational
+        |> scopeBlock blink theme.value
 
 
 
 -- Managing View Complexity --
 
 
-scopeBlock : Blink -> Color -> List (Element Msg) -> Element Msg
+scopeBlock : Hi.Blink -> Color -> List (Element Msg) -> Element Msg
 scopeBlock blink color elems =
     column
         [ Border.widthEach { edges | left = borderWidth }
         , Border.roundEach { corners | topLeft = margin, bottomLeft = margin }
-        , Font.color <| blinkColor blink color
+        , Font.color <| Hi.blinkColor blink color
         ]
         elems
 
 
-topHeader : Blink -> Color -> String -> Maybe Sem.Anno -> Element Msg
+topHeader : Hi.Blink -> Color -> String -> Maybe Sem.Anno -> Element Msg
 topHeader blink color label maybeAnno =
     let
         style =
@@ -711,8 +784,8 @@ topHeader blink color label maybeAnno =
                     , topRight = margin
                     , bottomRight = margin
                 }
-            , Font.color <| blinkColor blink color
-            , Bg.color <| Hi.addAlpha 0.2 color
+            , Font.color <| Hi.blinkColor blink color
+            , Bg.color <| Hi.addAlpha 0.2 <| Hi.blinkColor blink color
 
             --, Bg.color Hi.bgBlue
             , Font.justify
@@ -722,7 +795,7 @@ topHeader blink color label maybeAnno =
     maybeButton style label maybeAnno
 
 
-midHeader : Blink -> Color -> String -> Maybe Sem.Anno -> Element Msg
+midHeader : Hi.Blink -> Color -> String -> Maybe Sem.Anno -> Element Msg
 midHeader blink color label maybeAnno =
     let
         style =
@@ -739,8 +812,8 @@ midHeader blink color label maybeAnno =
                 }
 
             --, Bg.color Hi.bgBlue
-            , Font.color <| blinkColor blink color
-            , Bg.color <| Hi.addAlpha 0.2 color
+            , Font.color <| Hi.blinkColor blink color
+            , Bg.color <| Hi.addAlpha 0.2 <| Hi.blinkColor blink color
             , Font.justify
             , paddingXY (gap * 2) gap
             ]
@@ -789,14 +862,14 @@ maybeButton style label maybeAnno =
                 }
 
 
-singletonHeader : Blink -> Color -> String -> Maybe Sem.Anno -> Element Msg
+singletonHeader : Hi.Blink -> Color -> String -> Maybe Sem.Anno -> Element Msg
 singletonHeader blink color label maybeAnno =
     let
         style =
-            [ Font.color <| blinkColor blink color
+            [ Font.color <| Hi.blinkColor blink color
             , Border.width borderWidth
             , Border.rounded margin
-            , Bg.color <| Hi.addAlpha 0.2 color
+            , Bg.color <| Hi.addAlpha 0.2 <| Hi.blinkColor blink color
             , Font.justify
             , paddingXY (gap * 2) gap
             ]
@@ -817,10 +890,10 @@ subScope elem =
 -- Keyboard Extras --
 
 
-keyboardButton : Blink -> Color -> String -> Element Msg
+keyboardButton : Hi.Blink -> Color -> String -> Element Msg
 keyboardButton blink color label =
     el
-        [ Font.color <| blinkColor blink color
+        [ Font.color <| Hi.blinkColor blink color
         , Font.center
         , Border.width borderWidth
         , Border.rounded margin

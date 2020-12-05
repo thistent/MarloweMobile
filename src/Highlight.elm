@@ -1,6 +1,53 @@
-module Highlight exposing (..)
+module Highlight exposing
+    ( Blink(..)
+    , Theme
+    , addAlpha
+    , blinkColor
+    , keyboardBorder
+    , lightTheme
+    , lighten
+    )
 
+import Color as C
+import Color.Manipulate as CM
 import Element exposing (Color, fromRgb, rgb, toRgb)
+
+
+type alias Theme =
+    { contract : Color
+    , observation : Color
+    , action : Color
+    , value : Color
+    , payee : Color
+    , party : Color
+    , token : Color
+    , bound : Color
+    , str : Color
+    , num : Color
+    , accent : Color
+    , bg : Color
+    , barBg : Color
+    , fg : Color
+    }
+
+
+lightTheme : Theme
+lightTheme =
+    { contract = rgb 0.75 0.25 1
+    , observation = rgb 0.1 0.8 0.7
+    , action = rgb 1 0.75 0.25
+    , value = rgb 1 0 0.25
+    , payee = rgb 0.5 0.25 1
+    , party = rgb 1 0.5 0.5
+    , token = rgb 1 0.25 0
+    , bound = rgb 0 0.5 0.5
+    , str = rgb 0.25 0.75 0
+    , num = rgb 1 0.5 0
+    , accent = accentPink
+    , bg = black
+    , barBg = bgBlue
+    , fg = white
+    }
 
 
 keyboardBorder =
@@ -125,12 +172,12 @@ valueEQ =
 
 trueObs : Color
 trueObs =
-    rgb 0.64 0.8 1
+    rgb 0.6 0.8 1
 
 
 falseObs : Color
 falseObs =
-    rgb 0.2 0.25 0.5
+    rgb 0.45 0.6 0.75
 
 
 deposit : Color
@@ -163,6 +210,11 @@ rational =
     rgb 0.6 0.8 0.2
 
 
+token : Color
+token =
+    rgb 1 0.3 0
+
+
 
 -- Color Functions --
 
@@ -174,3 +226,72 @@ addAlpha alpha color =
             { c | alpha = alpha }
     in
     color |> toRgb |> addA |> fromRgb
+
+
+
+-- Blink Type and Color Modification --
+
+
+type Blink
+    = Empty
+    | HalfFull
+    | Full
+    | HalfEmpty
+
+
+nextBlink : Blink -> Blink
+nextBlink blink =
+    case blink of
+        Empty ->
+            HalfFull
+
+        HalfFull ->
+            Full
+
+        Full ->
+            HalfEmpty
+
+        HalfEmpty ->
+            Empty
+
+
+lighten : Color -> Color
+lighten =
+    toRgb
+        >> C.fromRgba
+        >> CM.desaturate 0.1
+        >> CM.lighten 0.1
+        >> C.toRgba
+        >> fromRgb
+
+
+blinkColor : Blink -> Color -> Color
+blinkColor blink baseColor =
+    let
+        half =
+            baseColor
+                |> toRgb
+                >> C.fromRgba
+                |> CM.desaturate 0.2
+                >> CM.lighten 0.2
+                |> C.toRgba
+                >> fromRgb
+    in
+    case blink of
+        Empty ->
+            baseColor
+
+        HalfFull ->
+            half
+
+        Full ->
+            baseColor
+                |> toRgb
+                >> C.fromRgba
+                |> CM.desaturate 0.3
+                >> CM.lighten 0.4
+                |> C.toRgba
+                >> fromRgb
+
+        HalfEmpty ->
+            half

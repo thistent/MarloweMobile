@@ -46,176 +46,58 @@ type Token
     = Token CurrencySymbol TokenName
 
 
+type AnnoToken
+    = AnnoToken CurrencySymbol TokenName Anno
+
+
+annotateToken : Token -> AnnoToken
+annotateToken (Token sym name) =
+    AnnoToken sym name U.unique
+
+
 type alias ValueId =
     Int
 
 
-type Payee
-    = Account AccountId
-    | Party String
 
-
-type Bound
-    = Bound Int Int
-
-
-type Case a b
-    = Case a b
-
-
-type Rational
-    = Rational Int Int
-
-
-type AccountId
-    = AccountId Int String
-
-
-type ChoiceId
-    = ChoiceId String String
-
-
-type Contract
-    = Refund
-    | Pay AccountId Payee (Value Observation) Contract
-    | If Observation Contract Contract
-    | When (List (Case Action Contract)) ValueId Contract
-    | Let ValueId (Value Observation) Contract
-
-
-type Value a
-    = AvailableMoney --AccountId Token
-    | Constant Int
-    | NegValue (Value a)
-    | AddValue (Value a) (Value a)
-    | SubValue (Value a) (Value a)
-    | MulValue (Value a) (Value a)
-    | Scale Rational (Value a)
-    | ChoiceValue ChoiceId (Value a) -- (Value a) not present in Haskell code
-    | SlotIntervalStart
-    | SlotIntervalEnd
-    | UseValue ValueId
-    | Cond a (Value a) (Value a)
-
-
-type Observation
-    = AndObs Observation Observation
-    | OrObs Observation Observation
-    | NotObs Observation
-    | ChooseSomething ChoiceId
-    | ValueGE (Value Observation) (Value Observation)
-    | ValueGT (Value Observation) (Value Observation)
-    | ValueLT (Value Observation) (Value Observation)
-    | ValueLE (Value Observation) (Value Observation)
-    | ValueEQ (Value Observation) (Value Observation)
-    | TrueObs
-    | FalseObs
-
-
-type Action
-    = Deposit AccountId String (Value Observation)
-    | Choice ChoiceId (List Bound)
-    | Notify Observation
-
-
-
--- Annotated Types --
+-- Annotation --
 
 
 type alias Anno =
     U.Unique U.Id
 
 
-type AnnoNum
-    = AnnoNum Int Anno
+
+-- Contract --
 
 
-type AnnoString
-    = AnnoString String Anno
-
-
-type AnnoPayee
-    = AnnoAccount AnnoAccountId Anno
-    | AnnoParty AnnoString Anno
-
-
-type AnnoBound
-    = AnnoBound AnnoNum AnnoNum Anno
-
-
-type AnnoRational
-    = AnnoRational AnnoNum AnnoNum Anno
-
-
-type AnnoAccountId
-    = AnnoAccountId AnnoNum AnnoString Anno
-
-
-type AnnoChoiceId
-    = AnnoChoiceId AnnoString AnnoString Anno
-
-
-type AnnoCase a b
-    = AnnoCase a b Anno
+type Contract
+    = Close
+    | Pay Party Payee Token (Value Observation) Contract
+    | If Observation Contract Contract
+    | When (List (Case Action Contract)) ValueId Contract
+    | Let ValueId (Value Observation) Contract
 
 
 type AnnoContract
-    = AnnoRefund Anno
-    | AnnoPay AnnoAccountId AnnoPayee (AnnoValue AnnoObservation) AnnoContract Anno
+    = AnnoClose Anno
+    | AnnoPay AnnoParty AnnoPayee AnnoToken (AnnoValue AnnoObservation) AnnoContract Anno
     | AnnoIf AnnoObservation AnnoContract AnnoContract Anno
     | AnnoWhen (List (AnnoCase AnnoAction AnnoContract)) AnnoNum AnnoContract Anno
     | AnnoLet AnnoNum (AnnoValue AnnoObservation) AnnoContract Anno
 
 
-type AnnoValue a
-    = AnnoAvailableMoney Anno
-    | AnnoConstant AnnoNum Anno
-    | AnnoNegValue (AnnoValue a) Anno
-    | AnnoAddValue (AnnoValue a) (AnnoValue a) Anno
-    | AnnoSubValue (AnnoValue a) (AnnoValue a) Anno
-    | AnnoMulValue (AnnoValue a) (AnnoValue a) Anno
-    | AnnoScale AnnoRational (AnnoValue a) Anno
-    | AnnoChoiceValue AnnoChoiceId (AnnoValue a) Anno
-    | AnnoSlotIntervalStart Anno
-    | AnnoSlotIntervalEnd Anno
-    | AnnoUseValue AnnoNum Anno
-    | AnnoCond a (AnnoValue a) (AnnoValue a) Anno
-
-
-type AnnoObservation
-    = AnnoAndObs AnnoObservation AnnoObservation Anno
-    | AnnoOrObs AnnoObservation AnnoObservation Anno
-    | AnnoNotObs AnnoObservation Anno
-    | AnnoChooseSomething AnnoChoiceId Anno
-    | AnnoValueGE (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
-    | AnnoValueGT (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
-    | AnnoValueLT (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
-    | AnnoValueLE (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
-    | AnnoValueEQ (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
-    | AnnoTrueObs Anno
-    | AnnoFalseObs Anno
-
-
-type AnnoAction
-    = AnnoDeposit AnnoAccountId AnnoString (AnnoValue AnnoObservation) Anno
-    | AnnoChoice AnnoChoiceId (List AnnoBound) Anno
-    | AnnoNotify AnnoObservation Anno
-
-
-
--- Annotation Functions --
-
-
 annotateContract : Contract -> AnnoContract
 annotateContract contract =
     case contract of
-        Refund ->
-            AnnoRefund U.unique
+        Close ->
+            AnnoClose U.unique
 
-        Pay p1 p2 v c ->
+        Pay p1 p2 t v c ->
             AnnoPay
-                (annotateAccountId p1)
+                (annotateParty p1)
                 (annotatePayee p2)
+                (annotateToken t)
                 (annotateValue v)
                 (annotateContract c)
                 U.unique
@@ -240,6 +122,40 @@ annotateContract contract =
                 (annotateValue val)
                 (annotateContract a)
                 U.unique
+
+
+
+-- Value --
+
+
+type Value a
+    = AvailableMoney --AccountId Token
+    | Constant Int
+    | NegValue (Value a)
+    | AddValue (Value a) (Value a)
+    | SubValue (Value a) (Value a)
+    | MulValue (Value a) (Value a)
+    | Scale Rational (Value a)
+    | ChoiceValue ChoiceId -- (Value a) not present in Haskell code
+    | SlotIntervalStart
+    | SlotIntervalEnd
+    | UseValue ValueId
+    | Cond a (Value a) (Value a)
+
+
+type AnnoValue a
+    = AnnoAvailableMoney Anno
+    | AnnoConstant AnnoNum Anno
+    | AnnoNegValue (AnnoValue a) Anno
+    | AnnoAddValue (AnnoValue a) (AnnoValue a) Anno
+    | AnnoSubValue (AnnoValue a) (AnnoValue a) Anno
+    | AnnoMulValue (AnnoValue a) (AnnoValue a) Anno
+    | AnnoScale AnnoRational (AnnoValue a) Anno
+    | AnnoChoiceValue AnnoChoiceId Anno
+    | AnnoSlotIntervalStart Anno
+    | AnnoSlotIntervalEnd Anno
+    | AnnoUseValue AnnoNum Anno
+    | AnnoCond a (AnnoValue a) (AnnoValue a) Anno
 
 
 annotateValue : Value Observation -> AnnoValue AnnoObservation
@@ -282,10 +198,9 @@ annotateValue val =
                 (annotateValue v)
                 U.unique
 
-        ChoiceValue id v ->
+        ChoiceValue id ->
             AnnoChoiceValue
                 (annotateChoiceId id)
-                (annotateValue v)
                 U.unique
 
         SlotIntervalStart ->
@@ -303,6 +218,38 @@ annotateValue val =
                 (annotateValue a)
                 (annotateValue b)
                 U.unique
+
+
+
+-- Observation --
+
+
+type Observation
+    = AndObs Observation Observation
+    | OrObs Observation Observation
+    | NotObs Observation
+    | ChooseSomething ChoiceId
+    | ValueGE (Value Observation) (Value Observation)
+    | ValueGT (Value Observation) (Value Observation)
+    | ValueLT (Value Observation) (Value Observation)
+    | ValueLE (Value Observation) (Value Observation)
+    | ValueEQ (Value Observation) (Value Observation)
+    | TrueObs
+    | FalseObs
+
+
+type AnnoObservation
+    = AnnoAndObs AnnoObservation AnnoObservation Anno
+    | AnnoOrObs AnnoObservation AnnoObservation Anno
+    | AnnoNotObs AnnoObservation Anno
+    | AnnoChooseSomething AnnoChoiceId Anno
+    | AnnoValueGE (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
+    | AnnoValueGT (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
+    | AnnoValueLT (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
+    | AnnoValueLE (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
+    | AnnoValueEQ (AnnoValue AnnoObservation) (AnnoValue AnnoObservation) Anno
+    | AnnoTrueObs Anno
+    | AnnoFalseObs Anno
 
 
 annotateObservation : Observation -> AnnoObservation
@@ -367,19 +314,37 @@ annotateObservation obs =
             AnnoFalseObs U.unique
 
 
+
+-- Action --
+
+
+type Action
+    = Deposit Party Party Token (Value Observation)
+    | Choice ChoiceId (List Bound)
+    | Notify Observation
+
+
+type AnnoAction
+    = AnnoDeposit AnnoParty AnnoParty AnnoToken (AnnoValue AnnoObservation) Anno
+    | AnnoChoice AnnoChoiceId (List AnnoBound) Anno
+    | AnnoNotify AnnoObservation Anno
+
+
 annotateAction : Action -> AnnoAction
 annotateAction act =
     case act of
-        Deposit id str v ->
+        Deposit p1 p2 tok v ->
             AnnoDeposit
-                (annotateAccountId id)
-                (annotateString str)
+                (annotateParty p1)
+                (annotateParty p2)
+                (annotateToken tok)
                 (annotateValue v)
                 U.unique
 
         Choice id xs ->
             AnnoChoice
                 (annotateChoiceId id)
+                --(annotateParty party)
                 (xs |> List.map annotateBound)
                 U.unique
 
@@ -387,6 +352,18 @@ annotateAction act =
             AnnoNotify
                 (annotateObservation o)
                 U.unique
+
+
+
+-- Case --
+
+
+type Case a b
+    = Case a b
+
+
+type AnnoCase a b
+    = AnnoCase a b Anno
 
 
 annotateCase : Case Action Contract -> AnnoCase AnnoAction AnnoContract
@@ -397,28 +374,42 @@ annotateCase (Case a c) =
         U.unique
 
 
-annotateChoiceId : ChoiceId -> AnnoChoiceId
-annotateChoiceId (ChoiceId s1 s2) =
-    AnnoChoiceId
-        (annotateString s1)
-        (annotateString s2)
-        U.unique
+
+-- Party --
 
 
-annotateRational : Rational -> AnnoRational
-annotateRational (Rational n1 n2) =
-    AnnoRational
-        (annotateNum n1)
-        (annotateNum n2)
-        U.unique
+type Party
+    = PK String
+    | Role String
 
 
-annotateAccountId : AccountId -> AnnoAccountId
-annotateAccountId (AccountId num str) =
-    AnnoAccountId
-        (annotateNum num)
-        (annotateString str)
-        U.unique
+type AnnoParty
+    = AnnoPK AnnoString Anno
+    | AnnoRole AnnoString Anno
+
+
+annotateParty : Party -> AnnoParty
+annotateParty p =
+    case p of
+        PK key ->
+            AnnoPK (AnnoString key U.unique) U.unique
+
+        Role name ->
+            AnnoRole (AnnoString name U.unique) U.unique
+
+
+
+-- Payee --
+
+
+type Payee
+    = Account AccountId
+    | Party Party
+
+
+type AnnoPayee
+    = AnnoAccount AnnoAccountId Anno
+    | AnnoParty AnnoParty Anno
 
 
 annotatePayee : Payee -> AnnoPayee
@@ -429,10 +420,82 @@ annotatePayee p =
                 (annotateAccountId id)
                 U.unique
 
-        Party str ->
+        Party party ->
             AnnoParty
-                (annotateString str)
+                (annotateParty party)
                 U.unique
+
+
+
+-- ChoiceId --
+
+
+type ChoiceId
+    = ChoiceId String Party
+
+
+type AnnoChoiceId
+    = AnnoChoiceId AnnoString AnnoParty Anno
+
+
+annotateChoiceId : ChoiceId -> AnnoChoiceId
+annotateChoiceId (ChoiceId s p) =
+    AnnoChoiceId
+        (annotateString s)
+        (annotateParty p)
+        U.unique
+
+
+
+-- Rational --
+
+
+type Rational
+    = Rational Int Int
+
+
+type AnnoRational
+    = AnnoRational AnnoNum AnnoNum Anno
+
+
+annotateRational : Rational -> AnnoRational
+annotateRational (Rational n1 n2) =
+    AnnoRational
+        (annotateNum n1)
+        (annotateNum n2)
+        U.unique
+
+
+
+-- AccountId --
+
+
+type AccountId
+    = AccountId Int String
+
+
+type AnnoAccountId
+    = AnnoAccountId AnnoNum AnnoString Anno
+
+
+annotateAccountId : AccountId -> AnnoAccountId
+annotateAccountId (AccountId num str) =
+    AnnoAccountId
+        (annotateNum num)
+        (annotateString str)
+        U.unique
+
+
+
+-- Bound --
+
+
+type Bound
+    = Bound Int Int
+
+
+type AnnoBound
+    = AnnoBound AnnoNum AnnoNum Anno
 
 
 annotateBound : Bound -> AnnoBound
@@ -443,9 +506,25 @@ annotateBound (Bound i j) =
         U.unique
 
 
+
+-- Number --
+
+
+type AnnoNum
+    = AnnoNum Int Anno
+
+
 annotateNum : Int -> AnnoNum
 annotateNum n =
     AnnoNum n U.unique
+
+
+
+-- String --
+
+
+type AnnoString
+    = AnnoString String Anno
 
 
 annotateString : String -> AnnoString
@@ -520,93 +599,43 @@ couponBondGuaranteed =
     When
         [ Case
             (Deposit
-                (AccountId 0 "investor")
-                "guarantor"
-                (Constant 1030)
+                (Role "investor")
+                (Role "investor")
+                (Token "" "")
+                (Constant 850)
             )
-            (When
-                [ Case
-                    (Deposit
-                        (AccountId 0 "investor")
-                        "investor"
-                        (Constant 1000)
-                    )
-                    (Pay
-                        (AccountId 0 "investor")
-                        (Party "issuer")
-                        (Constant 1000)
-                        (When
-                            [ Case
-                                (Deposit
-                                    (AccountId 0 "investor")
-                                    "issuer"
-                                    (Constant 10)
-                                )
-                                (Pay
-                                    (AccountId 0 "investor")
-                                    (Party "investor")
-                                    (Constant 10)
-                                    (Pay
-                                        (AccountId 0 "investor")
-                                        (Party "guarantor")
-                                        (Constant 10)
-                                        (When
-                                            [ Case
-                                                (Deposit
-                                                    (AccountId 0 "investor")
-                                                    "issuer"
-                                                    (Constant 10)
-                                                )
-                                                (Pay
-                                                    (AccountId 0 "investor")
-                                                    (Party "investor")
-                                                    (Constant 10)
-                                                    (Pay
-                                                        (AccountId 0 "investor")
-                                                        (Party "guarantor")
-                                                        (Constant 10)
-                                                        (When
-                                                            [ Case
-                                                                (Deposit
-                                                                    (AccountId 0 "investor")
-                                                                    "issuer"
-                                                                    (Constant 1010)
-                                                                )
-                                                                (Pay
-                                                                    (AccountId 0 "investor")
-                                                                    (Party "investor")
-                                                                    (Constant 1010)
-                                                                    (Pay
-                                                                        (AccountId 0 "investor")
-                                                                        (Party "guarantor")
-                                                                        (Constant 1010)
-                                                                        Refund
-                                                                    )
-                                                                )
-                                                            ]
-                                                            20
-                                                            Refund
-                                                        )
-                                                    )
-                                                )
-                                            ]
-                                            15
-                                            Refund
-                                        )
-                                    )
-                                )
-                            ]
-                            10
-                            Refund
+            (Pay
+                (Role "investor")
+                (Party
+                    (Role "issuer")
+                )
+                (Token "" "")
+                (Constant 850)
+                (When
+                    [ Case
+                        (Deposit
+                            (Role "investor")
+                            (Role "issuer")
+                            (Token "" "")
+                            (Constant 1000)
                         )
-                    )
-                ]
-                5
-                Refund
+                        (Pay
+                            (Role "investor")
+                            (Party
+                                (Role "investor")
+                            )
+                            (Token "" "")
+                            (Constant 1000)
+                            Close
+                        )
+                    ]
+                    20
+                    Close
+                )
             )
         ]
-        5
-        Refund
+        10
+        Close
 
 
 escrow : Contract
@@ -614,166 +643,92 @@ escrow =
     When
         [ Case
             (Deposit
-                (AccountId 0 "alice")
-                "alice"
+                (Role "alice")
+                (Role "alice")
+                (Token "" "")
                 (Constant 450)
             )
             (When
                 [ Case
                     (Choice
-                        (ChoiceId "choice" "alice")
-                        [ Bound 0 1
-                        ]
-                    )
-                    (When
-                        [ Case
-                            (Choice
-                                (ChoiceId "choice" "bob")
-                                [ Bound 0 1
-                                ]
-                            )
-                            (If
-                                (ValueEQ
-                                    (ChoiceValue
-                                        (ChoiceId "choice" "alice")
-                                        (Constant 42)
-                                    )
-                                    (ChoiceValue
-                                        (ChoiceId "choice" "bob")
-                                        (Constant 42)
-                                    )
-                                )
-                                (If
-                                    (ValueEQ
-                                        (ChoiceValue
-                                            (ChoiceId "choice" "alice")
-                                            (Constant 42)
-                                        )
-                                        (Constant 0)
-                                    )
-                                    (Pay
-                                        (AccountId 0 "alice")
-                                        (Party "bob")
-                                        (Constant 450)
-                                        Refund
-                                    )
-                                    Refund
-                                )
-                                (When
-                                    [ Case
-                                        (Choice
-                                            (ChoiceId "choice" "carol")
-                                            [ Bound 1 1
-                                            ]
-                                        )
-                                        Refund
-                                    , Case
-                                        (Choice
-                                            (ChoiceId "choice" "carol")
-                                            [ Bound 0 0
-                                            ]
-                                        )
-                                        (Pay
-                                            (AccountId 0 "alice")
-                                            (Party "bob")
-                                            (Constant 450)
-                                            Refund
-                                        )
-                                    ]
-                                    100
-                                    Refund
-                                )
-                            )
-                        ]
-                        60
-                        (When
-                            [ Case
-                                (Choice
-                                    (ChoiceId "choice" "carol")
-                                    [ Bound 1 1
-                                    ]
-                                )
-                                Refund
-                            , Case
-                                (Choice
-                                    (ChoiceId "choice" "carol")
-                                    [ Bound 0 0
-                                    ]
-                                )
-                                (Pay
-                                    (AccountId 0 "alice")
-                                    (Party "bob")
-                                    (Constant 450)
-                                    Refund
-                                )
-                            ]
-                            100
-                            Refund
+                        (ChoiceId "choice"
+                            (Role "alice")
                         )
-                    )
-                , Case
-                    (Choice
-                        (ChoiceId "choice" "bob")
                         [ Bound 0 1
                         ]
                     )
                     (When
                         [ Case
                             (Choice
-                                (ChoiceId "choice" "alice")
+                                (ChoiceId "choice"
+                                    (Role "bob")
+                                )
                                 [ Bound 0 1
                                 ]
                             )
                             (If
                                 (ValueEQ
                                     (ChoiceValue
-                                        (ChoiceId "choice" "alice")
-                                        (Constant 42)
+                                        (ChoiceId "choice"
+                                            (Role "alice")
+                                        )
                                     )
                                     (ChoiceValue
-                                        (ChoiceId "choice" "bob")
-                                        (Constant 42)
+                                        (ChoiceId "choice"
+                                            (Role "bob")
+                                        )
                                     )
                                 )
                                 (If
                                     (ValueEQ
                                         (ChoiceValue
-                                            (ChoiceId "choice" "alice")
-                                            (Constant 42)
+                                            (ChoiceId "choice"
+                                                (Role "alice")
+                                            )
                                         )
                                         (Constant 0)
                                     )
                                     (Pay
-                                        (AccountId 0 "alice")
-                                        (Party "bob")
+                                        (Role "alice")
+                                        (Party
+                                            (Role "bob")
+                                        )
+                                        (Token "" "")
                                         (Constant 450)
-                                        Refund
+                                        Close
                                     )
-                                    Refund
+                                    Close
                                 )
                                 (When
                                     [ Case
                                         (Choice
-                                            (ChoiceId "choice" "carol")
+                                            (ChoiceId "choice"
+                                                (Role "carol")
+                                            )
                                             [ Bound 1 1
                                             ]
                                         )
-                                        Refund
+                                        Close
                                     , Case
                                         (Choice
-                                            (ChoiceId "choice" "carol")
+                                            (ChoiceId "choice"
+                                                (Role "carol")
+                                            )
                                             [ Bound 0 0
                                             ]
                                         )
                                         (Pay
-                                            (AccountId 0 "alice")
-                                            (Party "bob")
+                                            (Role "alice")
+                                            (Party
+                                                (Role "bob")
+                                            )
+                                            (Token "" "")
                                             (Constant 450)
-                                            Refund
+                                            Close
                                         )
                                     ]
                                     100
-                                    Refund
+                                    Close
                                 )
                             )
                         ]
@@ -781,35 +736,72 @@ escrow =
                         (When
                             [ Case
                                 (Choice
-                                    (ChoiceId "choice" "carol")
+                                    (ChoiceId "choice"
+                                        (Role "carol")
+                                    )
                                     [ Bound 1 1
                                     ]
                                 )
-                                Refund
+                                Close
                             , Case
                                 (Choice
-                                    (ChoiceId "choice" "carol")
+                                    (ChoiceId "choice"
+                                        (Role "carol")
+                                    )
                                     [ Bound 0 0
                                     ]
                                 )
                                 (Pay
-                                    (AccountId 0 "alice")
-                                    (Party "bob")
+                                    (Role "alice")
+                                    (Party
+                                        (Role "bob")
+                                    )
+                                    (Token "" "")
                                     (Constant 450)
-                                    Refund
+                                    Close
                                 )
                             ]
                             100
-                            Refund
+                            Close
                         )
                     )
                 ]
                 40
-                Refund
+                (When
+                    [ Case
+                        (Choice
+                            (ChoiceId "choice"
+                                (Role "carol")
+                            )
+                            [ Bound 1 1
+                            ]
+                        )
+                        Close
+                    , Case
+                        (Choice
+                            (ChoiceId "choice"
+                                (Role "carol")
+                            )
+                            [ Bound 0 0
+                            ]
+                        )
+                        (Pay
+                            (Role "alice")
+                            (Party
+                                (Role "bob")
+                            )
+                            (Token "" "")
+                            (Constant 450)
+                            Close
+                        )
+                    ]
+                    100
+                    Close
+                )
             )
         ]
         10
-        Refund
+        Close
 
 
 swap : Contract
@@ -817,60 +809,43 @@ swap =
     When
         [ Case
             (Deposit
-                (AccountId 1 "party1")
-                "party1"
+                (Role "party1")
+                (Role "party1")
+                (Token "" "")
                 (Constant 500)
             )
             (When
                 [ Case
                     (Deposit
-                        (AccountId 2 "party2")
-                        "party2"
+                        (Role "party2")
+                        (Role "party2")
+                        (Token "" "")
                         (Constant 300)
                     )
                     (Pay
-                        (AccountId 1 "party1")
-                        (Party "party2")
+                        (Role "party1")
+                        (Party
+                            (Role "party2")
+                        )
+                        (Token "" "")
                         (Constant 500)
                         (Pay
-                            (AccountId 2 "party2")
-                            (Party "party1")
+                            (Role "party2")
+                            (Party
+                                (Role "party1")
+                            )
+                            (Token "" "")
                             (Constant 300)
-                            Refund
+                            Close
                         )
                     )
                 ]
                 20
-                Refund
-            )
-        , Case
-            (Deposit
-                (AccountId 2 "party2")
-                "party2"
-                (Constant 300)
-            )
-            (When
-                [ Case
-                    (Deposit
-                        (AccountId 1 "party1")
-                        "party1"
-                        (Constant 500)
-                    )
-                    (Pay
-                        (AccountId 1 "party1")
-                        (Account
-                            (AccountId 2 "party2")
-                        )
-                        (Constant 200)
-                        Refund
-                    )
-                ]
-                20
-                Refund
+                Close
             )
         ]
         15
-        Refund
+        Close
 
 
 zeroCouponBond : Contract
@@ -878,32 +853,40 @@ zeroCouponBond =
     When
         [ Case
             (Deposit
-                (AccountId 0 "investor")
-                "investor"
+                (Role "investor")
+                (Role "investor")
+                (Token "" "")
                 (Constant 850)
             )
             (Pay
-                (AccountId 0 "investor")
-                (Party "issuer")
+                (Role "investor")
+                (Party
+                    (Role "issuer")
+                )
+                (Token "" "")
                 (Constant 850)
                 (When
                     [ Case
                         (Deposit
-                            (AccountId 0 "investor")
-                            "issuer"
+                            (Role "investor")
+                            (Role "issuer")
+                            (Token "" "")
                             (Constant 1000)
                         )
                         (Pay
-                            (AccountId 0 "investor")
-                            (Party "investor")
+                            (Role "investor")
+                            (Party
+                                (Role "investor")
+                            )
+                            (Token "" "")
                             (Constant 1000)
-                            Refund
+                            Close
                         )
                     ]
                     20
-                    Refund
+                    Close
                 )
             )
         ]
         10
-        Refund
+        Close
