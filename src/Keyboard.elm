@@ -60,10 +60,10 @@ kb viewport =
             [ key (Paste <| Sem.ContractExpr Sem.Close) theme.contract "Refund"
 
             -- refund
-            , key (Paste <| Sem.ContractExpr Sem.Close) theme.str "\" \""
+            , key (Paste <| Sem.ContractExpr Sem.Close) theme.fg "\" \""
 
             -- string
-            , key (Paste <| Sem.ContractExpr Sem.Close) theme.num "42"
+            , key (Paste <| Sem.ContractExpr Sem.Close) theme.fg "42"
 
             -- numColor
             , key (Paste <| Sem.ContractExpr Sem.Close) theme.value "ValueId"

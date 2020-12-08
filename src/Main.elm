@@ -95,7 +95,10 @@ init () url key =
 
 subs : Model -> Sub Msg
 subs model =
-    Events.onAnimationFrameDelta TimeDelta
+    Sub.batch
+        [ Events.onAnimationFrameDelta TimeDelta
+        , Events.onResize ScreenSize
+        ]
 
 
 
@@ -137,9 +140,7 @@ update msg model =
 
             else
                 ( { model | timeDelta = 0 }
-                , Cmd.batch
-                    [ Task.perform UpdateViewport Dom.getViewport
-                    ]
+                , Cmd.none
                 )
 
         SwitchContract contract ->
@@ -188,6 +189,13 @@ update msg model =
                 , keyboardState = True --not model.keyboardState
               }
             , Cmd.none
+            )
+
+        ScreenSize _ _ ->
+            ( model
+            , Cmd.batch
+                [ Task.perform UpdateViewport Dom.getViewport
+                ]
             )
 
 
@@ -394,11 +402,9 @@ genContractView blink contract =
                     |> List.map (genCaseView blink)
                     |> (\x ->
                             (++) x
-                                [ singletonHeader blink theme.action "..." <| Just anno ]
+                                [ singletonHeader blink theme.caseColor "..." <| Just anno ]
                        )
                 )
-
-            --, subScope <| singletonHeader blink theme.action "..." <| Just anno
             , midHeader blink color "after slot" <| Just anno
             , subScope <| genNumberView blink color t
             , midHeader blink color "continue as" <| Just anno
@@ -421,10 +427,10 @@ genCaseView : Hi.Blink -> Sem.AnnoCase Sem.AnnoAction Sem.AnnoContract -> Elemen
 genCaseView blink (Sem.AnnoCase a c anno) =
     let
         color =
-            theme.action
+            theme.caseColor
     in
-    [ --topHeader blink color "Action of" <| Just anno ,
-      subScope <| genActionView blink a
+    [ topHeader blink color "Case" <| Just anno
+    , subScope <| genActionView blink a
     , midHeader blink color "continue as" <| Just anno
     , subScope <| genContractView blink c
     ]
@@ -502,7 +508,7 @@ genTokenView blink (Sem.AnnoToken sym name anno) =
     singletonHeader blink
         theme.token
         (if sym == "" && name == "" then
-            "ada"
+            "Ada"
 
          else
             "Token with currency "
@@ -525,7 +531,10 @@ genValueView blink val =
             singletonHeader blink color "Available Money" <| Just anno
 
         Sem.AnnoConstant num anno ->
-            genNumberView blink color num
+            [ topHeader blink color "Constant" <| Just anno
+            , subScope <| genNumberView blink color num
+            ]
+                |> scopeBlock blink color
 
         Sem.AnnoNegValue v anno ->
             [ topHeader blink color "negative" <| Just anno
@@ -563,7 +572,7 @@ genValueView blink val =
                 |> scopeBlock blink color
 
         Sem.AnnoChoiceValue id anno ->
-            [ topHeader blink color "A choice of" <| Just anno
+            [ topHeader blink color "Choice value" <| Just anno
             , subScope <| genChoiceIdView blink id
             ]
                 |> scopeBlock blink color
@@ -707,7 +716,7 @@ genActionView blink action =
                 |> scopeBlock blink color
 
         Sem.AnnoNotify obs anno ->
-            [ topHeader blink color "Notify when" <| Just anno
+            [ topHeader blink color "Notification of" <| Just anno
             , subScope <| genObservationView blink obs
             ]
                 |> scopeBlock blink color
@@ -733,9 +742,9 @@ genChoiceIdView blink (Sem.AnnoChoiceId choice owner anno) =
         color =
             theme.value
     in
-    [ topHeader blink color "The value identified by" <| Just anno
+    [ topHeader blink color "Choice ID" <| Just anno
     , subScope <| genStringView blink color choice
-    , midHeader blink color "and owned by" <| Just anno
+    , midHeader blink color "owned by" <| Just anno
     , subScope <| genPartyView blink owner
     ]
         |> scopeBlock blink color

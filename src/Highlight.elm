@@ -17,13 +17,15 @@ type alias Theme =
     { contract : Color
     , observation : Color
     , action : Color
+    , caseColor : Color
     , value : Color
     , payee : Color
     , party : Color
     , token : Color
     , bound : Color
-    , str : Color
-    , num : Color
+
+    --, str : Color
+    --, num : Color
     , accent : Color
     , bg : Color
     , barBg : Color
@@ -36,13 +38,15 @@ lightTheme =
     { contract = rgb 0.75 0.25 1
     , observation = rgb 0.1 0.8 0.7
     , action = rgb 1 0.75 0.25
+    , caseColor = rgb 1 0.5 0.25
     , value = rgb 1 0 0.25
     , payee = rgb 0.5 0.25 1
     , party = rgb 1 0.5 0.5
     , token = rgb 1 0.25 0
     , bound = rgb 0 0.5 0.5
-    , str = rgb 0.25 0.75 0
-    , num = rgb 1 0.5 0
+
+    --, str = rgb 0.25 0.75 0
+    --, num = rgb 1 0.5 0
     , accent = accentPink
     , bg = black
     , barBg = bgBlue

@@ -20,6 +20,7 @@ type Msg
     | ToggleMenu
     | UpdateViewport Dom.Viewport
     | Select (Maybe Anno)
+    | ScreenSize Int Int
 
 
 type SampleContract
