@@ -259,14 +259,19 @@ nextBlink blink =
             Empty
 
 
-lighten : Color -> Color
-lighten =
+applyCM : (C.Color -> C.Color) -> Color -> Color
+applyCM colorFun =
     toRgb
         >> C.fromRgba
-        >> CM.desaturate 0.1
-        >> CM.lighten 0.1
+        >> colorFun
         >> C.toRgba
         >> fromRgb
+
+
+lighten : Color -> Color
+lighten =
+    applyCM
+        (CM.desaturate 0.1 >> CM.lighten 0.1)
 
 
 blinkColor : Blink -> Color -> Color
@@ -274,12 +279,8 @@ blinkColor blink baseColor =
     let
         half =
             baseColor
-                |> toRgb
-                >> C.fromRgba
-                |> CM.desaturate 0.2
-                >> CM.lighten 0.2
-                |> C.toRgba
-                >> fromRgb
+                |> applyCM
+                    (CM.desaturate 0.2 >> CM.lighten 0.2)
     in
     case blink of
         Empty ->
