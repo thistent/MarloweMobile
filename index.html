@@ -6269,13 +6269,21 @@ var $author$project$Main$update = F2(
 						{keyboardState: true, selected: maybeAnno}),
 					$elm$core$Platform$Cmd$none);
 			default:
+				var x = msg.a;
+				var y = msg.b;
+				var oldDisp = model.display;
+				var oldVp = oldDisp.viewport;
+				var newVp = _Utils_update(
+					oldVp,
+					{height: y, width: x});
+				var newDisp = _Utils_update(
+					oldDisp,
+					{viewport: newVp});
 				return _Utils_Tuple2(
-					model,
-					$elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								A2($elm$core$Task$perform, $author$project$Marlowe$Semantics$UpdateViewport, $elm$browser$Browser$Dom$getViewport)
-							])));
+					_Utils_update(
+						model,
+						{display: newDisp}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Marlowe$Semantics$AnnoCase = F3(

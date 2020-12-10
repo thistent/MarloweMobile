@@ -191,11 +191,25 @@ update msg model =
             , Cmd.none
             )
 
-        ScreenSize _ _ ->
-            ( model
-            , Cmd.batch
-                [ Task.perform UpdateViewport Dom.getViewport
-                ]
+        ScreenSize x y ->
+            let
+                oldDisp =
+                    model.display
+
+                oldVp =
+                    oldDisp.viewport
+
+                newVp =
+                    { oldVp | width = toFloat x, height = toFloat y }
+
+                newDisp =
+                    { oldDisp | viewport = newVp }
+            in
+            ( { model | display = newDisp }
+            , Cmd.none
+              --, Cmd.batch
+              --    [ Task.perform UpdateViewport Dom.getViewport
+              --    ]
             )
 
 
