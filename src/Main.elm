@@ -256,12 +256,12 @@ view model =
                 , clipY
                 , scrollbarY
                 ]
-                ([ topHeader Hi.Empty theme.contract "Contract such that" Nothing
+                ([ topHeader Hi.Empty (Hi.darken theme.contract) "Contract such that" Nothing
                  , subScope <|
                     genContractView Hi.Empty {- model.blink -} <|
                         Sem.annotateContract model.sampleContract
                  ]
-                    |> scopeBlock Hi.Empty theme.contract
+                    |> scopeBlock Hi.Empty (Hi.darken theme.contract)
                 )
         ]
     }

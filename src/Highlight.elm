@@ -3,12 +3,14 @@ module Highlight exposing
     , Theme
     , addAlpha
     , blinkColor
+    , darken
     , keyboardBorder
     , lightTheme
     , lighten
     )
 
 import Color as C
+import Color.Blending as CB
 import Color.Manipulate as CM
 import Element exposing (Color, fromRgb, rgb, toRgb)
 
@@ -259,8 +261,8 @@ nextBlink blink =
             Empty
 
 
-applyCM : (C.Color -> C.Color) -> Color -> Color
-applyCM colorFun =
+mapColorFun : (C.Color -> C.Color) -> Color -> Color
+mapColorFun colorFun =
     toRgb
         >> C.fromRgba
         >> colorFun
@@ -268,19 +270,39 @@ applyCM colorFun =
         >> fromRgb
 
 
+map2ColorFun : (C.Color -> C.Color -> C.Color) -> Color -> Color -> Color
+map2ColorFun f c1 c2 =
+    let
+        cc1 =
+            c1 |> toRgb >> C.fromRgba
+
+        cc2 =
+            c2 |> toRgb >> C.fromRgba
+    in
+    f cc1 cc2 |> C.toRgba >> fromRgb
+
+
 lighten : Color -> Color
 lighten =
-    applyCM
-        (CM.desaturate 0.1 >> CM.lighten 0.1)
+    rgb 0.5 0.5 0.5
+        |> map2ColorFun CB.screen
+
+
+
+--(CM.desaturate 0.1 >> CM.lighten 0.1)
+
+
+darken : Color -> Color
+darken =
+    rgb 0.3 0.3 0.3
+        |> map2ColorFun CB.softlight
 
 
 blinkColor : Blink -> Color -> Color
 blinkColor blink baseColor =
     let
         half =
-            baseColor
-                |> applyCM
-                    (CM.desaturate 0.2 >> CM.lighten 0.2)
+            mapColorFun (CM.desaturate 0.2 >> CM.lighten 0.2) baseColor
     in
     case blink of
         Empty ->
@@ -290,13 +312,7 @@ blinkColor blink baseColor =
             half
 
         Full ->
-            baseColor
-                |> toRgb
-                >> C.fromRgba
-                |> CM.desaturate 0.3
-                >> CM.lighten 0.4
-                |> C.toRgba
-                >> fromRgb
+            mapColorFun (CM.desaturate 0.3 >> CM.lighten 0.4) baseColor
 
         HalfEmpty ->
             half
